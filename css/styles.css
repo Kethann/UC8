@@ -193,8 +193,10 @@ html.intro-active .intro, .intro.is-out, .intro.is-flying {
 .intro__logo { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: 0; }
 .intro__logo.is-on { opacity: 1; }
 .seglogo--intro { width: min(72vw, 560px); height: auto; overflow: visible; }
-.seglogo--intro .seg { opacity: 0; fill: #f6f7ff; transition: filter 0.4s; }
-.seglogo--intro .seg.is-lit { filter: var(--seg-glow); }
+.seglogo--intro .seg { opacity: 0; fill: #f6f7ff; }
+/* Glow is applied ONCE to the whole group (was once per segment = ~17 full-size blurs per frame). */
+.seglogo--intro.is-glow .seglogo__glyphs { filter: var(--seg-glow); }
+@media (max-width: 899px) { .intro.is-flying .seglogo__glyphs, .intro.is-flying .seglogo__label { filter: none; } }
 .seglogo--intro .seglogo__label { opacity: 0; fill: #e9ebf5; filter: var(--seg-glow); }
 .intro__scan {
   position: absolute; left: 0; right: 0; top: 0; height: 100%; opacity: 0; pointer-events: none; mix-blend-mode: screen;

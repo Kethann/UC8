@@ -11,14 +11,13 @@
   const ctx = c.getContext('2d');
   const TAU = Math.PI * 2;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let w = 0, h = 0, dpr = 1, mobile = false;
+  let w = 0, h = 0, dpr = 1, mobile = false, dirty = true;
 
   // y: base height (0..1) · amp: curve amplitude · f: curve frequency · ph: phase
   // wid: bundle half-width (×h) · tf/tph: twist freq/phase · n: hairlines · tilt · sp: drift speed · a: brightness
   const RIBBONS = [
     { y: 0.20, amp: 0.13, f: 0.9, ph: 0.0, wid: 0.15, tf: 1.25, tph: 0.4, n: 54, tilt: 0.22, sp: 0.06, a: 0.30, sc: 1.0 },
     { y: 0.58, amp: 0.17, f: 0.7, ph: 2.1, wid: 0.19, tf: 0.95, tph: 2.0, n: 62, tilt: -0.3, sp: -0.045, a: 0.34, sc: -1.3 },
-    { y: 0.90, amp: 0.12, f: 1.1, ph: 4.0, wid: 0.13, tf: 1.6, tph: 1.1, n: 46, tilt: 0.12, sp: 0.05, a: 0.24, sc: 0.8 },
     { y: 0.40, amp: 0.24, f: 0.55, ph: 1.3, wid: 0.08, tf: 2.1, tph: 3.0, n: 30, tilt: -0.45, sp: -0.035, a: 0.20, sc: 1.6, warm: true },
   ];
   const STEPS = 44;          // points per hairline (lower = cheaper, still smooth at this size)
@@ -27,7 +26,7 @@
   /* Dust particles */
   let dust = [];
   function makeDust() {
-    const n = mobile ? 34 : 70;
+    const n = mobile ? 20 : 40;
     dust = Array.from({ length: n }, () => ({
       x: Math.random(), y: Math.random(), z: 0.2 + Math.random() * 0.8,
       r: 0.4 + Math.random() * 1.3, tw: Math.random() * TAU, sp: 0.2 + Math.random() * 0.8,
@@ -42,6 +41,7 @@
     c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
     c.style.width = w + 'px'; c.style.height = h + 'px';
     makeDust();
+    dirty = true;
   }
 
   let scrollY = window.scrollY, smoothS = scrollY;
@@ -73,11 +73,11 @@
       const u = k / 10, i = Math.round(((u - u0) / span) * STEPS);
       const fold = 1 - Math.min(1, Math.abs(wv[Math.max(0, Math.min(STEPS, i))]) / wmax);
       const edge = Math.min(1, u * 5, (1 - u) * 5) * 0.6 + 0.4;
-      const al = r.a * (0.28 + 0.9 * fold * fold) * edge * (r.warm ? 0.55 : 1);
+      const al = 0.85 * r.a * (0.28 + 0.9 * fold * fold) * edge * (r.warm ? 0.55 : 1);
       g.addColorStop(u, `rgba(${base[0]},${base[1]},${base[2]},${al.toFixed(3)})`);
     }
     ctx.strokeStyle = g;
-    const n = Math.round(r.n * (mobile ? 0.35 : 0.6));
+    const n = Math.round(r.n * (mobile ? 0.25 : 0.4));   // fewer hairlines per ribbon
     ctx.beginPath();
     for (let j = 0; j < n; j++) {
       const o = (j / (n - 1)) * 2 - 1;
@@ -95,9 +95,14 @@
     requestAnimationFrame(frame);
     if (last && now - last < FRAME_MS - 2) return;
     if (document.documentElement.classList.contains('intro-active')) { last = now; return; } // hidden under the intro
-    const dt = Math.min(0.1, (now - last) / 1000 || 0.033); last = now;
-    if (!reduce) T += dt;
-    smoothS += (scrollY - smoothS) * 0.14;
+    last = now;
+    // Waves move only while the page scrolls. When it is still, nothing is redrawn (zero cost).
+    const diff = scrollY - smoothS;
+    if (Math.abs(diff) < 0.3 && !dirty) return;
+    smoothS = Math.abs(diff) < 0.3 ? scrollY : smoothS + diff * 0.14;
+    const move = Math.min(1, Math.abs(diff) / 40);       // 0 = still, 1 = scrolling fast
+    if (!reduce) T += move * 0.03;                       // drift is driven by scrolling, not by time
+    dirty = false;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.lineWidth = mobile ? 0.6 : 0.7;
@@ -106,8 +111,8 @@
     // Moving dust
     ctx.globalCompositeOperation = 'lighter';
     for (const p of dust) {
-      p.tw += dt * p.sp;
-      let y = (p.y * h - smoothS * p.z * 0.25 - T * 6 * p.z) % h; if (y < 0) y += h;
+      p.tw += move * 0.05 * p.sp;
+      let y = (p.y * h - smoothS * p.z * 0.25) % h; if (y < 0) y += h;
       const x = p.x * w + Math.sin(p.tw * 0.7) * 8 * p.z;
       const al = (0.12 + 0.35 * (0.5 + 0.5 * Math.sin(p.tw * 2))) * p.z;
       ctx.fillStyle = `rgba(255,122,26,${al.toFixed(3)})`;

@@ -69,7 +69,7 @@
   }
 
   /* ---------- layout ---------- */
-  let W = 0, H = 0, dpr = 1, ph = { x: 0, y: 0, w: 0, h: 0 }, traces = [], avoid = [];
+  let W = 0, H = 0, dpr = 1, quality = 0, ph = { x: 0, y: 0, w: 0, h: 0 }, traces = [], avoid = [];
   let seed = 11;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 
@@ -120,7 +120,7 @@
 
   function resize() {
     const r = hero.getBoundingClientRect();
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(quality ? 1 : 1.5, window.devicePixelRatio || 1); // decorative canvas: 1.5x is sharp enough; 1x on slow devices
     W = Math.round(r.width); H = Math.round(r.height);
     canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     measure(); buildTraces();
@@ -176,7 +176,6 @@
     const K = (per) => (prog != null ? prog : (u % per) / per); let glow = 0, gc = '255,122,26';
     ctx.save(); ctx.translate(x, y); const sc = R / 13; ctx.scale(sc, sc);
     ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 1.8; ctx.strokeStyle = '#fbf8f3';
-    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 3 * sc; ctx.shadowOffsetY = 1.2 * sc; // glyph floats inside the glass
     if (kind === 'camera') {
       const k = K(3);
       rr(-8, -4.5, 16, 11, 2.6); ctx.stroke();
@@ -321,7 +320,7 @@
       const r = R * (0.62 + 0.5 * dn);             // perspective size
       ctx.save();
       ctx.globalAlpha *= 0.45 + 0.55 * dn;
-      if (dn < 0.45 && 'filter' in ctx) ctx.filter = `blur(${((0.45 - dn) * 4).toFixed(2)}px)`; // depth of field
+      if (dn < 0.45) ctx.globalAlpha *= 0.75 + dn * 0.55; // far icons recede (cheap stand-in for a blur)
       glassBody(o.x, o.y, r, TINT[o.kind]);
       const g = drawGlyph(o.kind, o.x, o.y, r * 0.92, t, o.i);
       if (g.glow > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter';
@@ -368,17 +367,21 @@
     ctx.beginPath(); ctx.arc(x, y, r * 1.08, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.stroke();
     // engraved ticks rotating inside the ring
     ctx.save(); ctx.translate(x, y); ctx.rotate(-t * 0.07);
+    const tLong = new Path2D(), tMid = new Path2D(), tShort = new Path2D();
     for (let i = 0; i < 90; i++) {
       const a = (i / 90) * Math.PI * 2, long = i % 15 === 0, mid = i % 5 === 0;
-      const r1 = r * 1.12, r2 = r * (long ? 1.24 : mid ? 1.2 : 1.17);
-      ctx.beginPath(); ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1); ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
-      ctx.strokeStyle = long ? 'rgba(255,190,130,0.75)' : mid ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.14)'; ctx.lineWidth = long ? 1.4 : 1; ctx.stroke();
+      const r1 = r * 1.12, r2 = r * (long ? 1.24 : mid ? 1.2 : 1.17), path = long ? tLong : mid ? tMid : tShort;
+      path.moveTo(Math.cos(a) * r1, Math.sin(a) * r1); path.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
     }
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.stroke(tShort);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.stroke(tMid);
+    ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(255,190,130,0.75)'; ctx.stroke(tLong);
     ctx.restore();
     // progress arc for the current stage + spinning comet
     ctx.save(); ctx.translate(x, y); ctx.rotate(-Math.PI / 2);
-    ctx.beginPath(); ctx.arc(0, 0, R1 + 6, 0, Math.PI * 2 * ease(p)); ctx.strokeStyle = 'rgba(255,122,26,0.9)'; ctx.lineWidth = 2;
-    ctx.shadowColor = 'rgba(255,122,26,0.9)'; ctx.shadowBlur = 10; ctx.stroke(); ctx.restore();
+    ctx.beginPath(); ctx.arc(0, 0, R1 + 6, 0, Math.PI * 2 * ease(p));
+    ctx.strokeStyle = 'rgba(255,122,26,0.22)'; ctx.lineWidth = 8; ctx.stroke();   // soft glow (no shadow blur)
+    ctx.strokeStyle = 'rgba(255,122,26,0.9)'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
     ctx.save(); ctx.translate(x, y); ctx.rotate(t * 1.1);
     const cg = ctx.createLinearGradient(R1, 0, 0, R1); cg.addColorStop(0, 'rgba(255,255,255,0)'); cg.addColorStop(1, 'rgba(255,255,255,0.7)');
     ctx.beginPath(); ctx.arc(0, 0, R1 - 0.5, 0, Math.PI * 0.4); ctx.strokeStyle = cg; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
@@ -391,8 +394,10 @@
     // the glass dome
     const dome = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.05, x, y, r);
     dome.addColorStop(0, 'rgba(70,68,76,0.55)'); dome.addColorStop(0.55, 'rgba(22,22,27,0.82)'); dome.addColorStop(0.92, 'rgba(8,8,10,0.92)'); dome.addColorStop(1, 'rgba(255,255,255,0.2)');
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18;
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = dome; ctx.fill(); ctx.restore();
+    const dsh = ctx.createRadialGradient(x, y + 18, r * 0.7, x, y + 18, r * 1.35);   // drop shadow without shadowBlur
+    dsh.addColorStop(0, "rgba(0,0,0,0.6)"); dsh.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = dsh; ctx.beginPath(); ctx.arc(x, y + 18, r * 1.35, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = dome; ctx.fill();
     // tinted inner light for the stage
     const tl = ctx.createRadialGradient(x, y + r * 0.35, 0, x, y + r * 0.35, r * 0.9);
     tl.addColorStop(0, `rgba(${st.tint},0.22)`); tl.addColorStop(1, `rgba(${st.tint},0)`);
@@ -474,9 +479,9 @@
     ctx.save(); ctx.globalAlpha = vis * a;
     // connector to the trace end
     ctx.beginPath(); ctx.moveTo(n.x, y + h); ctx.lineTo(n.x, n.y - 5); ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
+    rr(x - 4, y + 6, w + 8, h + 8, 18); ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fill();   // cheap layered shadow
+    rr(x - 1, y + 4, w + 2, h + 2, 15); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill();
     rr(x, y, w, h, 14); ctx.fillStyle = 'rgba(28,28,32,0.92)'; ctx.fill();
-    ctx.shadowColor = 'transparent';
     ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.stroke();
     // leading visual
     const ix = x + 24, iy = y + h / 2;
@@ -504,12 +509,21 @@
      FRAME
      ========================================================================== */
   let raf = 0, visible = true, tPrev = performance.now(), t0 = tPrev;
+  let warmed = 0;
+  // Adaptive quality: 30fps normally; if this device can't keep up, drop to 20fps and 1x resolution.
+  let costSum = 0, costN = 0, lastMeasureY = -1, measureTick = 0;
   function frame(now) {
-    if (document.documentElement.classList.contains('intro-active')) { tPrev = now; raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; } // hidden under the intro
-    const dt = Math.max(0, Math.min(0.05, (now - tPrev) / 1000)); tPrev = now;
+    // Under the intro: draw only a couple of warm-up frames (hidden behind the black intro) so the
+    // one-off GPU setup cost (shaders, glyphs, buffers) is paid now, not when the logo flies to the nav.
+    if (document.documentElement.classList.contains('intro-active') && warmed >= 2) { tPrev = now; raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; }
+    if (warmed >= 2 && now - tPrev < (quality ? 50 : 33) - 4) { raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; }
+    warmed++;
+    const c0 = performance.now();
+    const dt = Math.max(0, Math.min(0.06, (now - tPrev) / 1000)); tPrev = now;
     const t = Math.max(0, (now - t0) / 1000);
-    measure();
-    const vis = visual ? Math.min(1, parseFloat(getComputedStyle(visual).opacity) || 0) : 1;
+    // Layout reads are costly: only re-measure when the page has scrolled (parallax moves the hub) or every ~0.5s.
+    if (window.scrollY !== lastMeasureY || ++measureTick % 15 === 0) { lastMeasureY = window.scrollY; measure(); }
+    const vo = visual ? visual.style.opacity : ''; const vis = vo === '' ? 1 : Math.min(1, parseFloat(vo) || 0);
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
@@ -517,17 +531,28 @@
 
     // traces
     const far = Math.max(W, H) * 0.5;
+    // Batched: one path per (colour, fade level) instead of one draw call per trace/node.
+    const groups = new Map();
+    const grp = (key, mk) => { let g = groups.get(key); if (!g) { g = mk(); groups.set(key, g); } return g; };
+    ctx.lineWidth = 1;
     traces.forEach((tr) => {
       const end = abs(tr.pts[tr.pts.length - 1]);
-      const fade = Math.max(0.25, 1 - Math.hypot(end[0] - ph.x, end[1] - ph.y) / far);
-      ctx.beginPath(); tr.pts.forEach((p, i) => { const q = abs(p); i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); });
-      ctx.strokeStyle = tr.hot ? rgba(ORANGE, 0.2 * fade) : rgba(WHITE, 0.09 * fade); ctx.lineWidth = 1; ctx.stroke();
+      const fade = Math.round(Math.max(0.25, 1 - Math.hypot(end[0] - ph.x, end[1] - ph.y) / far) * 6) / 6;
       tr.flash = Math.max(0, tr.flash - dt * 1.5);
-      ctx.beginPath(); ctx.arc(end[0], end[1], tr.node + tr.flash * 2.5, 0, Math.PI * 2);
-      if (tr.ring) { ctx.strokeStyle = tr.hot ? rgba(ORANGE, 0.45 * fade + tr.flash) : rgba(WHITE, 0.28 * fade + tr.flash * 0.6); ctx.stroke(); }
-      else { ctx.fillStyle = tr.hot ? rgba(ORANGE, 0.4 * fade + tr.flash * 0.6) : rgba(WHITE, 0.2 * fade + tr.flash * 0.6); ctx.fill(); }
-      if (tr.flash > 0.02) { ctx.beginPath(); ctx.arc(end[0], end[1], tr.node + (1 - tr.flash) * 16, 0, Math.PI * 2); ctx.strokeStyle = rgba(tr.hot ? ORANGE : WHITE, tr.flash * 0.5); ctx.stroke(); }
+      const line = grp('l' + tr.hot + fade, () => ({ p: new Path2D(), style: tr.hot ? rgba(ORANGE, 0.2 * fade) : rgba(WHITE, 0.09 * fade), stroke: true }));
+      tr.pts.forEach((p, i) => { const q = abs(p); i ? line.p.lineTo(q[0], q[1]) : line.p.moveTo(q[0], q[1]); });
+      if (tr.flash > 0.02) {   // the few flashing nodes are drawn individually
+        ctx.beginPath(); ctx.arc(end[0], end[1], tr.node + tr.flash * 2.5, 0, Math.PI * 2);
+        if (tr.ring) { ctx.strokeStyle = tr.hot ? rgba(ORANGE, 0.45 * fade + tr.flash) : rgba(WHITE, 0.28 * fade + tr.flash * 0.6); ctx.stroke(); }
+        else { ctx.fillStyle = tr.hot ? rgba(ORANGE, 0.4 * fade + tr.flash * 0.6) : rgba(WHITE, 0.2 * fade + tr.flash * 0.6); ctx.fill(); }
+        ctx.beginPath(); ctx.arc(end[0], end[1], tr.node + (1 - tr.flash) * 16, 0, Math.PI * 2); ctx.strokeStyle = rgba(tr.hot ? ORANGE : WHITE, tr.flash * 0.5); ctx.stroke();
+      } else {
+        const node = grp('n' + tr.hot + tr.ring + fade, () => ({ p: new Path2D(), stroke: tr.ring,
+          style: tr.ring ? (tr.hot ? rgba(ORANGE, 0.45 * fade) : rgba(WHITE, 0.28 * fade)) : (tr.hot ? rgba(ORANGE, 0.4 * fade) : rgba(WHITE, 0.2 * fade)) }));
+        node.p.moveTo(end[0] + tr.node, end[1]); node.p.arc(end[0], end[1], tr.node, 0, Math.PI * 2);
+      }
     });
+    groups.forEach((g) => { if (g.stroke) { ctx.strokeStyle = g.style; ctx.stroke(g.p); } else { ctx.fillStyle = g.style; ctx.fill(g.p); } });
 
     // pulses
     if (!reduce && Math.random() < dt * (W < 700 ? 3 : 5)) {
@@ -536,11 +561,16 @@
     }
     for (let i = pulses.length - 1; i >= 0; i--) {
       const p = pulses[i]; p.s += p.v * dt;
-      const col = p.hot ? ORANGE : WHITE, trail = 28, steps = 6;
-      for (let k = 0; k < steps; k++) {
-        const s0 = p.s - (trail * k) / steps, s1 = p.s - (trail * (k + 1)) / steps; if (s0 < 0) break;
-        const a = pointAt(p.t, Math.min(s0, p.t.L)), b = pointAt(p.t, Math.max(0, Math.min(s1, p.t.L)));
-        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.strokeStyle = rgba(col, (1 - k / steps) * 0.5); ctx.lineWidth = 1; ctx.stroke();
+      const col = p.hot ? ORANGE : WHITE, trail = 28;
+      if (p.s > 0) {
+        const sh = Math.min(p.s, p.t.L), st = Math.max(0, Math.min(p.s - trail, p.t.L));
+        if (sh > st) {
+          const a = pointAt(p.t, sh), b = pointAt(p.t, st), mid = pointAt(p.t, (sh + st) / 2);
+          const lg = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+          lg.addColorStop(0, rgba(col, 0.5)); lg.addColorStop(1, rgba(col, 0));
+          ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(mid[0], mid[1]); ctx.lineTo(b[0], b[1]);
+          ctx.strokeStyle = lg; ctx.lineWidth = 1; ctx.stroke();
+        }
       }
       if (p.s <= p.t.L) {
         const hd = pointAt(p.t, p.s), g = ctx.createRadialGradient(hd[0], hd[1], 0, hd[0], hd[1], 3.5);
@@ -562,12 +592,28 @@
     for (let i = notes.length - 1; i >= 0; i--) { if (now / 1000 - notes[i].born > notes[i].life) notes.splice(i, 1); }
     notes.forEach((n) => drawNote(n, now / 1000, vis));
     ctx.globalAlpha = 1;
+    // Warm-up while the black intro covers the page: also draw every notification style, then force
+    // the GPU to actually render it (a 1px read-back) and wipe it. The browser otherwise postpones a
+    // hidden canvas's first real render until it becomes visible -> a visible hitch after the intro.
+    if (document.documentElement.classList.contains('intro-active')) {
+      // Decide quality early (hidden warm-up frame #2): slow devices start in the light mode, so the
+      // moment the intro hands over is already smooth.
+      if (warmed === 2 && !quality && performance.now() - c0 > 8) { quality = 1; resize(); }
+      const nw = W < 700 ? 176 : 214;
+      NOTES.forEach((n, i) => drawNote({ ...n, x: 40, y: 140, bx: 20 + (i % 4) * (nw + 8), by: 20 + Math.floor(i / 4) * 56, nw, born: now / 1000 - 1, life: 3.4 }, now / 1000, 1));
+      try { ctx.getImageData(0, 0, 1, 1); } catch (e) {}
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    }
+    if (!document.documentElement.classList.contains('intro-active') && !quality) {
+      costSum += performance.now() - c0; costN++;
+      if (costN >= 30) { if (costSum / costN > 10) { quality = 1; resize(); } costSum = 0; costN = 0; }
+    }
     raf = visible && !reduce ? requestAnimationFrame(frame) : 0;
   }
 
   resize();
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { resize(); if (reduce) frame(performance.now()); }, 150); });
-  if (document.fonts) document.fonts.ready.then(resize);
+  if (document.fonts) document.fonts.ready.then(() => { resize(); if (document.documentElement.classList.contains('intro-active')) warmed = 0; });
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !raf && !reduce) { tPrev = performance.now(); raf = requestAnimationFrame(frame); } }).observe(hero);
   if (reduce) frame(performance.now() + 5200); else raf = requestAnimationFrame(frame);
 })();

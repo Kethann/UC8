@@ -143,7 +143,7 @@
     });
     // SURGE: the whole mark snaps fully on together with a bloom overshoot
     const ON = BO + 0.36;
-    tl.call(() => { segs.forEach((sg) => sg.classList.add('is-lit')); svg.classList.remove('is-surge'); void svg.getBBox(); svg.classList.add('is-surge'); }, null, ON);
+    tl.call(() => { segs.forEach((sg) => sg.classList.add('is-lit')); svg.classList.add('is-glow'); svg.classList.remove('is-surge'); void svg.getBBox(); svg.classList.add('is-surge'); }, null, ON);
     tl.to(segs, { opacity: 1, duration: 0.05 }, ON);
     const lastOne = shuffled[shuffled.length - 1];  // one stubborn segment settles a beat late
     tl.to(lastOne, { opacity: 0.35, duration: 0.03 }, ON + 0.16).to(lastOne, { opacity: 1, duration: 0.05 }, ON + 0.21);
@@ -232,7 +232,7 @@
     gsap.set(label.querySelectorAll('.seglogo__char'), { attr: { 'fill-opacity': 0 } });
     gsap.set(scan, { opacity: 0 }); gsap.set(svg, { opacity: 1, clearProps: 'transform' });
     gsap.set(root, { clearProps: 'backgroundColor' });
-    svg.classList.remove('is-surge'); root.classList.remove('is-flying'); html.classList.remove('logo-landing');
+    svg.classList.remove('is-surge', 'is-glow'); root.classList.remove('is-flying'); html.classList.remove('logo-landing');
   }
   /* Public: replay the intro (used by the nav UC8 logo) */
   function play() {
