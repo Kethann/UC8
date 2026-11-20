@@ -189,6 +189,106 @@
     $('#marqueeB').innerHTML = clientHTML(CL.slice(half));
   }
 
+  // Background artwork for each case card, drawn from what the client does (set `motif` in js/data.js).
+  // Shaded vector illustrations: crisp at any size, nothing to download. They animate once when the card scrolls into view.
+  function motif(p) {
+    const k = p.motif || (p.art === 'growth' ? 'saree' : 'event');
+    const u = 'm' + String(p.title).replace(/[^a-z0-9]/gi, '');
+    const svg = (vb, body, ar = 'xMaxYMax meet') => `<svg class="fx__motif fx__motif--${k}" viewBox="${vb}" preserveAspectRatio="${ar}" aria-hidden="true" focusable="false">${body}</svg>`;
+
+    if (k === 'saree') { // draped silk with a woven zari border
+      return svg('0 0 300 200', `<defs>
+        <linearGradient id="${u}s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d1730"/><stop offset=".45" stop-color="#a3223f"/><stop offset=".7" stop-color="#5c0e22"/><stop offset="1" stop-color="#2e0612"/></linearGradient>
+        <linearGradient id="${u}h" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#ffd9e2" stop-opacity=".32"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="${u}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd08a"/><stop offset=".35" stop-color="#ff9a3c"/><stop offset=".7" stop-color="#c25a0e"/><stop offset="1" stop-color="#ffb35c"/></linearGradient>
+        <linearGradient id="${u}sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <pattern id="${u}z" width="24" height="34" patternUnits="userSpaceOnUse" y="160">
+          <path d="M12 6 20 17 12 28 4 17Z" fill="url(#${u}g)"/><path d="M12 11 16 17 12 23 8 17Z" fill="#5c0e22"/><circle cx="12" cy="17" r="1.6" fill="url(#${u}g)"/>
+          <circle cx="0" cy="17" r="1.8" fill="url(#${u}g)"/><circle cx="24" cy="17" r="1.8" fill="url(#${u}g)"/></pattern>
+        <clipPath id="${u}cb"><rect y="152" width="300" height="48"/></clipPath></defs>
+        <g class="mo-drape">
+          <path d="M0 70C60 46 112 96 176 72S262 40 300 58V200H0Z" fill="url(#${u}s)"/>
+          <path d="M0 108C50 92 104 128 160 112S250 82 300 96V200H0Z" fill="#000" opacity=".18"/>
+          <path d="M30 200C60 150 92 106 150 80l18 2c-58 26-86 68-110 118Z" fill="url(#${u}h)"/>
+          <path d="M150 200c26-48 60-86 120-112l14 4c-56 24-90 62-112 108Z" fill="url(#${u}h)" opacity=".7"/>
+          <rect y="152" width="300" height="48" fill="#3e0917"/>
+          <rect y="154" width="300" height="3" fill="url(#${u}g)"/><rect y="194" width="300" height="3" fill="url(#${u}g)"/>
+          <rect y="160" width="300" height="34" fill="url(#${u}z)"/>
+          <g clip-path="url(#${u}cb)"><rect class="mo-sheen" x="-90" y="150" width="70" height="52" fill="url(#${u}sw)"/></g>
+        </g>`, 'xMidYMax slice');
+    }
+
+    if (k === 'car') { // pearl-white sedan with a verified seal
+      const wheel = (x) => `<g class="mo-wheel" style="transform-origin:${x}px 96px">
+          <circle cx="${x}" cy="96" r="17" fill="#0b0c0c"/><circle cx="${x}" cy="96" r="16" fill="none" stroke="#2b2e2e" stroke-width="2"/>
+          <circle cx="${x}" cy="96" r="11" fill="url(#${u}m)"/>
+          <g stroke="#2e3433" stroke-width="2.4" stroke-linecap="round">${[0, 72, 144, 216, 288].map((a) => `<path d="M${x} 96l${(Math.sin(a * Math.PI / 180) * 9).toFixed(1)} ${(-Math.cos(a * Math.PI / 180) * 9).toFixed(1)}"/>`).join('')}</g>
+          <circle cx="${x}" cy="96" r="3" fill="#cfd5d3"/></g>`;
+      return svg('0 0 240 124', `<defs>
+        <linearGradient id="${u}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#d9dfdd"/><stop offset=".7" stop-color="#9aa4a1"/><stop offset="1" stop-color="#4c5452"/></linearGradient>
+        <linearGradient id="${u}w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a3b38"/><stop offset=".5" stop-color="#0d1514"/><stop offset="1" stop-color="#1c2a28"/></linearGradient>
+        <linearGradient id="${u}r" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <radialGradient id="${u}m" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#f2f5f4"/><stop offset=".6" stop-color="#8d9694"/><stop offset="1" stop-color="#3a403f"/></radialGradient>
+        <radialGradient id="${u}sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".7"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${u}hl" cx="0" cy=".5" r="1"><stop offset="0" stop-color="#fff6d8" stop-opacity=".75"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${u}v" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#b9ffe3"/><stop offset=".55" stop-color="currentColor"/><stop offset="1" stop-color="#0f5c43"/></radialGradient></defs>
+        <g class="mo-car">
+          <ellipse cx="122" cy="113" rx="112" ry="8" fill="url(#${u}sh)"/>
+          <path class="mo-beam" d="M12 78 -40 64V96Z" fill="url(#${u}hl)"/>
+          <path d="M10 88c0-9 5-15 15-17l34-7c9-9 22-19 38-22l52-2c13 0 23 8 34 19l31 6c10 2 16 9 16 18v6c0 4-3 6-7 6h-31a20 20 0 0 0-40 0H76a20 20 0 0 0-40 0H17c-4 0-7-3-7-7Z" fill="url(#${u}b)"/>
+          <path d="M70 63c8-8 18-15 30-17l24-1v18Zm60-18 20-1c10 0 18 8 26 19h-46Z" fill="url(#${u}w)"/>
+          <path d="M84 62l16-15h8L92 62Zm54 0 12-17h5l-12 17Z" fill="#fff" opacity=".22"/>
+          <path d="M22 72 218 67" stroke="url(#${u}r)" stroke-width="2"/>
+          <path d="M98 64v28M128 63v29" stroke="#000" stroke-opacity=".28" stroke-width="1"/>
+          <path d="M110 74h8M140 74h8" stroke="#000" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M68 60l-4 4h8Z" fill="#7f8987"/>
+          <path d="M12 79c3-3 8-4 12-4l-2 6c-4 0-7 0-10-2Z" fill="#fffbe8"/>
+          <path d="M226 71l6 2v6l-7-1Z" fill="#ff3b3b"/>
+          ${wheel(56)}${wheel(176)}
+        </g>
+        <g class="mo-seal" style="transform-origin:214px 22px">
+          <circle cx="214" cy="22" r="20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.5 3.2" opacity=".75"/>
+          <circle cx="214" cy="22" r="15.5" fill="url(#${u}v)"/>
+          <path class="mo-check" pathLength="1" d="m206.5 22.5 5 5 9.5-10.5" fill="none" stroke="#06140f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>`);
+    }
+
+    if (k === 'tech') { // processor on a board
+      const pins = [];
+      for (let i = 0; i < 6; i++) { const v = 41 + i * 11.6; pins.push(`<rect x="${v - 2}" y="17" width="4" height="13" rx="1"/><rect x="${v - 2}" y="110" width="4" height="13" rx="1"/><rect x="17" y="${v - 2}" width="13" height="4" rx="1"/><rect x="110" y="${v - 2}" width="13" height="4" rx="1"/>`); }
+      return svg('0 0 140 140', `<defs>
+        <linearGradient id="${u}p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9eef2"/><stop offset=".5" stop-color="#9aa6b1"/><stop offset="1" stop-color="#5d6873"/></linearGradient>
+        <linearGradient id="${u}c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d2733"/><stop offset="1" stop-color="#0b1017"/></linearGradient>
+        <linearGradient id="${u}l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f7fa"/><stop offset=".35" stop-color="#c3ccd5"/><stop offset=".65" stop-color="#8e9aa6"/><stop offset="1" stop-color="#d5dde4"/></linearGradient>
+        <linearGradient id="${u}sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <radialGradient id="${u}gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="currentColor" stop-opacity=".5"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></radialGradient>
+        <clipPath id="${u}cl"><rect x="40" y="40" width="60" height="60" rx="6"/></clipPath></defs>
+        <circle class="mo-glow" cx="70" cy="70" r="70" fill="url(#${u}gl)"/>
+        <g class="mo-pins" fill="url(#${u}p)">${pins.join('')}</g>
+        <rect x="28" y="28" width="84" height="84" rx="9" fill="url(#${u}c)" stroke="#2c3846"/>
+        <rect x="40" y="40" width="60" height="60" rx="6" fill="url(#${u}l)"/>
+        <rect x="40.5" y="40.5" width="59" height="59" rx="5.5" fill="none" stroke="#fff" stroke-opacity=".6"/>
+        <text x="70" y="73" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.2" fill="#3a4550">SESRITHA</text>
+        <g clip-path="url(#${u}cl)"><rect class="mo-sheen" x="-10" y="20" width="26" height="100" fill="url(#${u}sw)" transform="rotate(20 70 70)"/></g>
+        <circle cx="34" cy="34" r="2" fill="#5d6873"/>`);
+    }
+
+    // event: warm string lights with soft glow
+    const bulbs = [[27, 34], [51, 40], [75, 36], [125, 36], [149, 40], [173, 34]];
+    return svg('0 0 200 100', `<defs>
+      <radialGradient id="${u}b" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fffdf5"/><stop offset=".45" stop-color="#ffe6b0"/><stop offset="1" stop-color="#ffb46b"/></radialGradient>
+      <radialGradient id="${u}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd9a0" stop-opacity=".6"/><stop offset=".45" stop-color="currentColor" stop-opacity=".2"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></radialGradient>
+      <radialGradient id="${u}k" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="currentColor" stop-opacity=".35"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></radialGradient></defs>
+      <g class="mo-bokeh"><circle cx="38" cy="78" r="16" fill="url(#${u}k)"/><circle cx="110" cy="84" r="11" fill="url(#${u}k)"/><circle cx="168" cy="74" r="19" fill="url(#${u}k)"/><circle cx="88" cy="64" r="7" fill="url(#${u}k)"/></g>
+      <path d="M4 18Q50 60 100 22Q150 60 196 18" fill="none" stroke="#2a2326" stroke-width="1.6"/>
+      <path d="M4 18Q50 60 100 22Q150 60 196 18" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width=".6" transform="translate(0 -.6)"/>
+      ${bulbs.map(([x, y], j) => `<g class="mo-bulb" style="--d:${(0.15 + j * 0.16).toFixed(2)}s">
+        <circle class="mo-halo" cx="${x}" cy="${y + 13}" r="15" fill="url(#${u}g)"/>
+        <rect x="${x - 2.6}" y="${y - 1}" width="5.2" height="6" rx="1.2" fill="#3b3337"/>
+        <path class="mo-lamp" d="M${x} ${y + 5}c-4 0-6.2 4-6.2 8 0 3.8 2.8 6.6 6.2 6.6s6.2-2.8 6.2-6.6c0-4-2.2-8-6.2-8Z" fill="url(#${u}b)"/>
+        <ellipse cx="${x - 2}" cy="${y + 11}" rx="1.4" ry="2.4" fill="#fff" opacity=".85"/></g>`).join('')}`, 'xMaxYMin meet');
+  }
+
   // projects
   function featuredArt(p) {
     const m = p.metric;
@@ -199,11 +299,7 @@
           <div class="fx__label mono"><svg class="ico"><use href="#i-instagram"/></svg>${m.label}</div>
           <span class="fx__chip"><svg class="ico"><use href="#i-arrow-ur"/></svg>${p.badge}</span>
         </div>
-        <svg class="fx__chart" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true">
-          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a1a" stop-opacity=".45"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></linearGradient></defs>
-          <path class="fx__area" d="M0 84 C40 82 60 80 90 74 S140 66 165 56 S215 34 240 24 S280 8 300 4 L300 90 L0 90Z" fill="url(#gfill)"/>
-          <path class="fx__line" pathLength="1" d="M0 84 C40 82 60 80 90 74 S140 66 165 56 S215 34 240 24 S280 8 300 4" fill="none" stroke="#ff7a1a" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
-        </svg>
+        ${motif(p)}
       </div>`;
     }
     // Lead-generation template: one or two animated results + funnel + popping tags
@@ -219,7 +315,7 @@
           <div class="fx__label mono"><svg class="ico"><use href="#i-${s.icon || 'team'}"/></svg>${esc(s.label)}</div>
         </div>`).join('')}
       </div>
-      <div class="fx__funnel" aria-hidden="true"><i style="--w:100%"></i><i style="--w:78%"></i><i style="--w:56%"></i><i style="--w:36%"></i></div>
+      ${motif(p)}
       <div class="fx__pings" aria-hidden="true">${pings.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
     </div>`;
   }
@@ -258,17 +354,17 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const grid = $('#workGrid');
   const caseCard = (p, i) => `
-    <article class="work-card work-card--featured case${(p.metrics || []).length > 1 ? ' case--multi' : ''}" data-cat="${p.category}" data-i="${i}">
+    <article class="work-card work-card--featured case case--${p.tone || 'brand'}${(p.metrics || []).length > 1 ? ' case--multi' : ''}" data-cat="${p.category}" data-i="${i}">
       <div class="work-card__inner case__inner">
         <div class="case__info">
-          <span class="case__kicker mono"><i></i>Case study · ${p.category}</span>
+          <span class="case__kicker mono"><i></i>${p.category}</span>
           <h3 class="case__title display">${p.title}</h3>
           <p class="case__line">${(p.line || p.sub).replace(/\*\*(.+?)\*\*/g, '<mark>$1</mark>')}</p>
           ${p.tags ? `<ul class="case__tags">${p.tags.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}
           ${socialOf(p) ? ((s) => `<div class="case__actions">
             <a class="case__ig case__ig--${s.net}" href="${s.url}" target="_blank" rel="noopener" aria-label="${esc(p.title)} on ${NET[s.net]} (opens in a new tab)">
-              <span class="case__ig-icon"><svg class="ico"><use href="#i-${s.net}"/></svg></span>
-              <span class="case__ig-text"><small>See the page</small>${esc(s.handle)}</span>
+              <span class="case__ig-icon"><svg class="ico brandmark"><use href="#i-${s.net === 'facebook' ? 'fb' : 'ig'}-logo"/></svg></span>
+              <span class="case__ig-text">${esc(s.handle)}</span>
               <svg class="ico case__ig-arrow"><use href="#i-arrow-ur"/></svg>
             </a>
           </div>`)(socialOf(p)) : ''}
@@ -284,7 +380,6 @@
         <div class="work-card__thumb">
           ${p.thumb ? `<img src="${p.thumb}" alt="${p.title}" loading="lazy" />` : (p.featured ? featuredArt(p) : thumbArt(p, i))}
           ${p.placeholder ? '<span class="ph-tag mono">Placeholder</span>' : ''}
-          ${p.featured ? '<span class="case-tag mono">Case study</span>' : ''}
           <span class="work-card__pin" aria-hidden="true"></span>
         </div>
         <div class="work-card__meta">
@@ -294,7 +389,7 @@
           </div>
           ${p.link
             ? `<a class="work-card__link" href="${p.link}" data-project="${i}" target="_blank" rel="noopener">${p.category === 'Websites' ? 'View project' : 'Explore'} <svg class="ico"><use href="#i-arrow"/></svg></a>`
-            : `<button class="work-card__link" type="button" data-project="${i}">${p.featured ? 'Case study' : p.category === 'Websites' ? 'View project' : 'Explore'} <svg class="ico"><use href="#i-arrow"/></svg></button>`}
+            : `<button class="work-card__link" type="button" data-project="${i}">${p.category === 'Websites' ? 'View project' : 'Explore'} <svg class="ico"><use href="#i-arrow"/></svg></button>`}
           ${p.instagram ? `<a class="work-card__ig" href="${p.instagram.url}" target="_blank" rel="noopener" aria-label="${p.title} on Instagram (opens in a new tab)"><svg class="ico"><use href="#i-instagram"/></svg>${p.instagram.handle}<svg class="ico"><use href="#i-arrow-ur"/></svg></a>` : ''}
         </div>
       </div>
@@ -315,33 +410,60 @@
     a.addEventListener('click', (e) => {
       e.preventDefault(); e.stopPropagation();
       const so = socialOf(p);
-      if (p.featured) openModal(`Case study · ${p.category}`, p.title, p.story, p.results, so && { href: so.url, label: `See ${so.handle} on ${NET[so.net]}`, icon: so.net });
+      if (p.featured) openModal(p.category, p.title, p.story, p.results, so && { href: so.url, label: `See ${so.handle} on ${NET[so.net]}`, icon: so.net });
       else openModal(`${p.category} · ${p.year}`, p.title, `${p.sub}. Placeholder project: replace it with real work in js/data.js.`, ['Challenge', 'Approach', 'Results']);
     });
   });
 
-  /* Animate case-study results after the grid loads. */
+  /* Play each card's artwork animation once, when that card scrolls into view. */
+  (function liveArt() {
+    const cards = $$('.case', grid);
+    if (!cards.length) return;
+    if (!('IntersectionObserver' in window)) { cards.forEach((c) => c.classList.add('is-live')); return; }
+    const io = new IntersectionObserver((ents) => ents.forEach((en) => {
+      // On the home page the stack animation marks each card live as it lands (grid.dataset.deal)
+      if (en.isIntersecting) { io.unobserve(en.target); if (grid.dataset.deal !== '1') en.target.classList.add('is-live'); }
+    }), { threshold: 0.35 });
+    cards.forEach((c) => io.observe(c));
+  })();
+
+  /* Count each card's numbers up when that card lands / comes into view (it gets .is-live). */
   (function results() {
-    const stageEl = $('#workStage');
-    let done = false;
-    const run = () => {
-      if (done) return; done = true;
-      $$('.work-card--featured', grid).forEach((c) => c.classList.add('is-counted'));
-      $$('[data-countto]', grid).forEach((el) => {
-        const to = +el.dataset.countto, from = +el.textContent || 0, t0 = performance.now(), dur = 1600;
+    const DUR = 800; // fast count, ease-out so it lands softly
+    const tick = (card) => {
+      $$('[data-countto]', card).forEach((el) => {
+        if (el.dataset.start === undefined) el.dataset.start = +el.textContent || 0;
+        const to = +el.dataset.countto, from = +el.dataset.start, t0 = performance.now();
+        const run = ++el._run || (el._run = 1);
         const step = (now) => {
-          const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+          if (el._run !== run) return; // a newer replay took over
+          const k = Math.min(1, (now - t0) / DUR), e = 1 - Math.pow(1 - k, 4);
           el.textContent = Math.round(from + (to - from) * e);
           if (k < 1) requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
       });
     };
-    new MutationObserver(() => { if (stageEl.classList.contains('is-resolved')) run(); }).observe(stageEl, { attributes: true, attributeFilter: ['class'] });
-    if (stageEl.classList.contains('is-resolved')) run();
-    if (typeof gsap === 'undefined') {
-      new IntersectionObserver(([en], o) => { if (en.isIntersecting) { run(); o.disconnect(); } }, { threshold: 0.4 }).observe(grid);
-    }
+    const count = (card) => {
+      if (card.classList.contains('is-counted')) return;
+      card.classList.add('is-counted');
+      tick(card);
+    };
+    // Replay the count when a card is hovered (mouse / trackpad only, at most once every 1.2s)
+    const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce;
+    $$('.work-card--featured', grid).forEach((card) => {
+      if (canHover) {
+        let last = 0;
+        card.addEventListener('mouseenter', () => {
+          const now = performance.now();
+          if (!card.classList.contains('is-counted') || now - last < 1200) return;
+          last = now; tick(card);
+        });
+      }
+      if (card.classList.contains('is-live')) { count(card); return; }
+      const mo = new MutationObserver(() => { if (card.classList.contains('is-live')) { mo.disconnect(); count(card); } });
+      mo.observe(card, { attributes: true, attributeFilter: ['class'] });
+    });
   })();
   }
 
@@ -641,44 +763,58 @@
   if (grid) {
   const stage = $('#workStage'), board = $('#workBoard'), table = $('.work__table', grid);
   const cards = () => $$('.work-card', grid).filter((c) => !c.hidden);
-  // Repeatable value for each card
-  const rnd = (i, k) => { const s = Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453; return s - Math.floor(s); };
-  function scatter(el, spreadX, spreadY) {
-    const i = +el.dataset.i, gw = grid.clientWidth, gh = grid.clientHeight;
-    const cx = el.offsetLeft + el.offsetWidth / 2, cy = el.offsetTop + el.offsetHeight / 2;
-    const tx = gw / 2 + (rnd(i, 1) - 0.5) * gw * spreadX, ty = gh / 2 + (rnd(i, 2) - 0.5) * gh * spreadY;
-    return { x: tx - cx, y: ty - cy, r: (rnd(i, 3) - 0.5) * 38, z: 10 + rnd(i, 4) * 70 };
-  }
 
   const mm = gsap.matchMedia();
   mm.add({ desk: '(min-width: 900px)', mob: '(max-width: 899px)', reduce: '(prefers-reduced-motion: reduce)' }, (ctx) => {
     const { desk, reduce: rm } = ctx.conditions;
     if (rm || ALL_WORK) { stage.classList.add('is-resolved'); if (!rm) gsap.from(cards(), { opacity: 0, y: 30, duration: 0.6, ease: 'power2.out', stagger: 0.04, clearProps: 'opacity,transform', scrollTrigger: { trigger: grid, start: 'top 90%', once: true } }); return; }
 
-    // Pin just below the fixed nav so the heading and filters are never hidden behind it.
+    grid.dataset.deal = '1';
+    const land = (el) => el.classList.add('is-live');
+    const tilt = [-4, 3, -2, 5, -3, 2]; // how each card sits in the pile
     const navH = () => (nav ? nav.offsetHeight : 0);
-    const fits = desk && stage.offsetHeight <= window.innerHeight - navH() + 4;
-    const sx = desk ? 0.5 : 0.36, sy = desk ? 0.3 : 0.16;
-    const st = fits
-      ? { trigger: stage, start: () => `top ${navH()}px`, end: `+=${Math.min(110, 60 + (PROJ.length + VIDS.length) * 8)}%`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
-      : { trigger: board, start: 'top 92%', end: desk ? 'top 25%' : 'top 35%', scrub: 0.5, invalidateOnRefresh: true };
-    st.onUpdate = (self) => stage.classList.toggle('is-resolved', self.progress > 0.9);
-    st.onLeave = () => stage.classList.add('is-resolved');
+    const fits = desk && board.offsetHeight <= window.innerHeight - navH() + 4;
+    gsap.set(table, { opacity: 0 });
+    gsap.set('.work-card__pin', { opacity: 0 });
 
-    const tl = gsap.timeline({ scrollTrigger: st });
-    tl.fromTo(grid, { rotateX: desk ? 54 : 40, rotateZ: desk ? -16 : -10, scale: desk ? 0.72 : 0.86, yPercent: desk ? 4 : 2 },
-      { rotateX: 0, rotateZ: 0, scale: 1, yPercent: 0, duration: 1, ease: 'power2.inOut' }, 0);
-    tl.fromTo('.work-card', {
-      x: (i, el) => scatter(el, sx, sy).x,
-      y: (i, el) => scatter(el, sx, sy).y,
-      rotation: (i, el) => scatter(el, sx, sy).r,
-      z: (i, el) => scatter(el, sx, sy).z,
-    }, { x: 0, y: 0, rotation: 0, z: 0, duration: 0.9, ease: 'power3.inOut', stagger: { each: 0.018, from: 'end' } }, 0.06);
-    tl.fromTo('.work-card__pin', { opacity: 1, scale: 1 }, { opacity: 0, scale: 0, duration: 0.2, stagger: 0.01 }, 0.12);
-    tl.fromTo(table, { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.06, duration: 0.55, ease: 'power2.in' }, 0.45);
-    tl.fromTo('.work__head', { opacity: 0.25, y: 30 }, { opacity: 1, y: 0, duration: 0.5 }, 0.5);
-    if (fits) tl.to({}, { duration: 0.12 }); // brief hold on the resolved grid
-    return () => stage.classList.remove('is-resolved');
+    if (fits) {
+      // Desktop: every card starts in one neat pile in the middle of the table.
+      // While the board is pinned, each scroll step deals the top card off the pile into its place.
+      const list = cards(), n = list.length;
+      const pile = (el) => {
+        const i = list.indexOf(el), gw = grid.clientWidth, gh = grid.clientHeight;
+        return { x: gw / 2 - (el.offsetLeft + el.offsetWidth / 2), y: gh / 2 - (el.offsetTop + el.offsetHeight / 2) - i * 6 };
+      };
+      list.forEach((el, i) => gsap.set(el, { zIndex: n - i }));
+      const tl = gsap.timeline({ scrollTrigger: {
+        trigger: board, start: () => `top ${navH() + 8}px`, end: () => `+=${Math.round(window.innerHeight * (0.45 + n * 0.42))}`,
+        scrub: 0.6, pin: true, anticipatePin: 1, invalidateOnRefresh: true,
+        onUpdate: (self) => stage.classList.toggle('is-resolved', self.progress > 0.92),
+        onLeave: () => { stage.classList.add('is-resolved'); list.forEach(land); },
+      } });
+      tl.fromTo(grid, { rotateX: 22, scale: 0.9 }, { rotateX: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0);
+      list.forEach((el, i) => {
+        tl.fromTo(el,
+          { x: () => pile(el).x, y: () => pile(el).y, rotation: tilt[i % tilt.length], scale: 0.9 },
+          { x: 0, y: 0, rotation: 0, scale: 1, duration: 1, ease: 'power3.inOut', immediateRender: true, onComplete: () => land(el) },
+          0.35 + i * 0.85);
+      });
+      tl.to({}, { duration: 0.25 }); // short hold on the finished table
+      return () => { stage.classList.remove('is-resolved'); delete grid.dataset.deal; gsap.set(list, { clearProps: 'zIndex' }); };
+    }
+
+    // Phones / small screens: the cards sit one under another, so each one is dealt
+    // into place from a tilted pile as you scroll down to it.
+    stage.classList.add('is-resolved');
+    const list = cards();
+    list.forEach((el, i) => {
+      gsap.fromTo(el,
+        { y: 70, rotation: tilt[i % tilt.length] * 0.8, scale: 0.92, opacity: 0.4 },
+        { y: 0, rotation: 0, scale: 1, opacity: 1, ease: 'power2.out', immediateRender: true,
+          scrollTrigger: { trigger: el, start: 'top 98%', end: 'top 62%', scrub: 0.5, invalidateOnRefresh: true, onLeave: () => land(el) },
+          onComplete: () => land(el) });
+    });
+    return () => { stage.classList.remove('is-resolved'); delete grid.dataset.deal; };
   });
 
   // Show filters for available project categories.

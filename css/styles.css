@@ -95,7 +95,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn {
   position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   padding: 15px 26px; border-radius: 999px; font-weight: 600; font-size: 15px; letter-spacing: 0.01em;
-  transition: transform 0.35s var(--ease), background 0.3s, color 0.3s, box-shadow 0.35s, border-color 0.3s;
+  transition: transform 0.35s var(--ease), background 0.3s, color 0.3s, box-shadow 0.35s, border-color 0.3s, scale 0.18s var(--ease);
   isolation: isolate; overflow: hidden; white-space: nowrap;
 }
 .btn .ico { transition: transform 0.35s var(--ease); }
@@ -352,7 +352,7 @@ html.logo-landing .nav__logo { opacity: 0; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .filter {
   padding: 9px 16px; border-radius: 999px; border: 1px solid var(--border-2); font-size: 13px; color: var(--muted); background: rgba(255, 255, 255, 0.02);
-  transition: color 0.3s, background 0.3s, border-color 0.3s;
+  transition: color 0.3s, background 0.3s, border-color 0.3s, scale 0.18s var(--ease);
 }
 .filter:hover { color: var(--text); border-color: rgba(255, 122, 26, 0.6); }
 .filter.is-active { background: var(--accent); color: #0b0b0b; border-color: var(--accent); font-weight: 600; }
@@ -872,7 +872,7 @@ html.no-gsap [data-hero], html.no-gsap [data-step] { opacity: 1 !important; tran
   display: inline-flex; align-items: center; gap: 12px; padding: 7px 16px 7px 7px; border-radius: 999px;
   background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  transition: border-color 0.3s, background 0.3s, translate 0.35s var(--ease);
+  transition: border-color 0.3s, background 0.3s, translate 0.35s var(--ease), scale 0.18s var(--ease);
 }
 .case__ig-icon {
   width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex: none;
@@ -1269,4 +1269,328 @@ html.no-gsap [data-hero], html.no-gsap [data-step] { opacity: 1 !important; tran
   .case .art--leads.is-multi .fx__metric { font-size: 34px; }
   .case .art--leads.is-multi .fx { gap: 10px; margin-top: 4px; }
   .case .art--leads.is-multi .fx__stat + .fx__stat { padding-top: 10px; }
+}
+
+/* ==========================================================================
+   Lead template v2: each client gets its own colour (--tc), with a soft glow
+   grid, gradient funnel and tinted tags. Radee Sarees keeps the brand orange.
+   ========================================================================== */
+.art.art--leads { --tc: #f48fc0; --tc2: #9c3f73; --tbg1: #1c0a1a; --tbg2: #0c060c; }       /* Maguvaa: festive magenta */
+.art.art--leads.tone--steel { --tc: #62d6ab; --tc2: #1f7a5d; --tbg1: #0b1714; --tbg2: #070b0a; } /* RS Verified Cars: emerald */
+.art.art--leads.tone--blue { --tc: #6cc4f5; --tc2: #2f67b8; --tbg1: #0a1424; --tbg2: #060a12; }  /* Sesritha: sky blue */
+.art.art--leads, .art.art--leads.tone--steel, .art.art--leads.tone--blue {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 28px 28px,
+    radial-gradient(75% 85% at 100% 100%, color-mix(in srgb, var(--tc) 32%, transparent), transparent 62%),
+    radial-gradient(65% 70% at 0% 0%, color-mix(in srgb, var(--tc2) 40%, transparent), transparent 66%),
+    linear-gradient(160deg, var(--tbg1), var(--tbg2));
+}
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+  .art.art--leads, .art.art--leads.tone--steel, .art.art--leads.tone--blue {
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(160deg, var(--tbg1), var(--tbg2));
+  }
+}
+.case .art.art--leads .fx__metric { color: var(--tc); text-shadow: 0 0 28px color-mix(in srgb, var(--tc) 40%, transparent); }
+.case .art.art--leads.is-multi .fx__stat + .fx__stat .fx__metric { color: #fff; text-shadow: none; }
+.case .art.art--leads .fx__label .ico { color: var(--tc); }
+.case .art.art--leads.is-multi .fx__stat + .fx__stat { border-top-color: color-mix(in srgb, var(--tc) 28%, transparent); }
+.art.art--leads .fx__funnel i { background: linear-gradient(90deg, var(--tc2), var(--tc)); opacity: 1; }
+.art.art--leads .fx__pings span { background: var(--tc); color: #07080a; font-weight: 600; }
+
+/* Card typography v2: plainer, editorial type instead of glowing mono labels */
+.case { --tc: var(--accent); }
+.case--violet { --tc: #f48fc0; } .case--steel { --tc: #62d6ab; } .case--blue { --tc: #6cc4f5; }
+.case .case__kicker {
+  font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: none; color: var(--tc); gap: 10px;
+}
+.case .case__kicker i {
+  width: 18px; height: 4px; border-radius: 0; background: var(--tc); box-shadow: none;
+  clip-path: polygon(2px 0, calc(100% - 2px) 0, 100% 50%, calc(100% - 2px) 100%, 2px 100%, 0 50%);
+}
+.case .case__title { letter-spacing: 0.005em; line-height: 0.98; }
+.case .case__line { font-size: 15.5px; line-height: 1.55; color: #c9c4bc; max-width: 36ch; }
+.case .case__line mark { background: none; padding: 0; color: #fff; font-weight: 600; }
+.case .case__tags li { font-size: 12px; padding: 4px 10px; color: #bdb8b0; border-color: rgba(255, 255, 255, 0.1); background: transparent; }
+.case .fx__label {
+  font-family: var(--font-body); font-size: 12.5px; font-weight: 500;
+  letter-spacing: 0.01em; text-transform: none; color: rgba(255, 255, 255, 0.78);
+}
+.case .fx__chip { font-family: var(--font-body); letter-spacing: 0.01em; }
+.case .art.art--leads .fx__pings span { font-family: var(--font-body); font-size: 10.5px; letter-spacing: 0.02em; text-transform: none; padding: 3px 9px; }
+
+/* Premium card shell v2: soft, light to render (no blur filters, no large animated glows) */
+.case .case__inner {
+  border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.09);
+  background:
+    radial-gradient(110% 90% at 0% 0%, rgba(255, 255, 255, 0.055), transparent 55%),
+    linear-gradient(165deg, #141417 0%, #0c0c0e 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 48px -28px rgba(0, 0, 0, 0.85);
+  transition: border-color 0.4s var(--ease), translate 0.5s var(--ease);
+}
+.case:hover .case__inner, .case:focus-within .case__inner {
+  border-color: rgba(255, 255, 255, 0.2); translate: 0 -3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 28px 54px -28px rgba(0, 0, 0, 0.9);
+}
+.case .case__visual { border-radius: 0 23px 23px 0; border-left-color: rgba(255, 255, 255, 0.06); }
+.case .case__visual::after { background: linear-gradient(125deg, rgba(255, 255, 255, 0.06) 0%, transparent 38%); }
+.case .art.art--leads .fx__metric, .case .art--growth .fx__metric b, .case .art--growth .fx__metric > span:last-child { text-shadow: none; }
+.case .case__ig { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.12); }
+@media (max-width: 640px) { .case .case__visual { border-radius: 23px 23px 0 0; } }
+@media (hover: none) { .case:hover .case__inner { translate: none; } }
+@media (prefers-reduced-motion: reduce) { .case .case__inner { transition: none; } .case:hover .case__inner { translate: none; } }
+
+/* Small labels: plain sans instead of spaced-out mono */
+.case .case__ig-text small { font-family: var(--font-body); font-size: 11px; letter-spacing: 0.01em; text-transform: none; color: rgba(255, 255, 255, 0.55); }
+.vcard .vcard__cat { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; color: #fff; }
+.vcard .vcard__dur { font-family: var(--font-body); font-size: 11px; font-weight: 500; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.vcard .vcard__info small { font-family: var(--font-body); font-size: 12px; letter-spacing: 0.01em; text-transform: none; font-variant-numeric: tabular-nums; }
+.case .art.art--leads .fx__label { white-space: nowrap; }
+@media (max-width: 640px) {
+  .vcard .vcard__cat, .vcard .vcard__dur { font-size: 10px; letter-spacing: 0.01em; }
+  .vcard .vcard__info small { font-size: 10.5px; }
+}
+
+/* Chevron mark ( > ) for sub-headings, card labels and video captions — replaces the dash */
+.eyebrow::before, .case .case__kicker i, .vcard__info small::before {
+  width: 8px; height: 11px; border-radius: 0; box-shadow: none;
+  clip-path: polygon(0 0, 45% 0, 100% 50%, 45% 100%, 0 100%, 55% 50%);
+}
+.eyebrow::before { width: 9px; height: 12px; }
+.vcard__info small::before { width: 7px; height: 10px; margin: 0 7px 1px 0; }
+@media (max-width: 640px) { .vcard__info small::before { width: 6px; height: 9px; margin-right: 6px; } }
+
+/* Social link: no caption, one line, pinned to the same spot at the bottom of every card */
+.case .case__info { justify-content: flex-start; }
+.case .case__actions { margin-top: auto; padding-top: 6px; }
+.case .case__ig { align-items: center; padding: 6px 16px 6px 6px; max-width: 100%; }
+.case .case__ig-text { display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+
+/* ==========================================================================
+   Case card background art (v3): one design per client, no chart or grid lines
+   ========================================================================== */
+.art.art--leads, .art.art--leads.tone--steel, .art.art--leads.tone--blue {
+  background:
+    radial-gradient(75% 85% at 100% 100%, rgba(255, 255, 255, 0.05), transparent 62%),
+    radial-gradient(70% 75% at 0% 0%, var(--tglow, rgba(244, 143, 192, 0.22)), transparent 66%),
+    linear-gradient(160deg, var(--tbg1), var(--tbg2));
+}
+.art.art--leads { --tglow: rgba(244, 143, 192, 0.22); }
+.art.art--leads.tone--steel { --tglow: rgba(98, 214, 171, 0.2); }
+.art.art--leads.tone--blue { --tglow: rgba(108, 196, 245, 0.22); }
+.art.art--growth {
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(255, 122, 26, 0.22), transparent 62%),
+    linear-gradient(160deg, #2a0b14 0%, #1a070d 55%, #0f0508 100%);
+}
+.fx__motif { position: absolute; z-index: 0; pointer-events: none; color: var(--tc, var(--accent)); display: block; overflow: visible; }
+.fx, .fx__pings, .fx__chip { z-index: 2; }
+.case .fx__pings { position: absolute; }
+/* Radee Sarees: zari border along the bottom, faint butta pattern behind */
+.fx__motif--saree { inset: 0; color: var(--accent); }
+.fx__motif--saree svg { position: absolute; left: 0; width: 100%; }
+.fx__motif--saree .fx__motif-field { top: 0; height: 100%; opacity: 0.22;
+  -webkit-mask-image: linear-gradient(200deg, #000 10%, transparent 70%); mask-image: linear-gradient(200deg, #000 10%, transparent 70%); }
+.fx__motif--saree .fx__motif-band { bottom: 0; height: 58px; opacity: 0.85; }
+/* Maguvaa: string lights */
+.fx__motif--event { top: 10px; right: 8px; width: 56%; height: 58%; opacity: 0.9; }
+.fx__bulb { animation: bulbGlow 2.8s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes bulbGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+/* RS Verified Cars: car with verified seal */
+.fx__motif--car { right: 12px; bottom: 44px; width: 58%; height: 64%; opacity: 0.95; }
+/* Sesritha Technology: chip */
+.fx__motif--tech { right: 6%; top: 50%; width: 40%; height: 70%; transform: translateY(-50%); opacity: 0.85; }
+.case .art.art--leads .fx { grid-column: 1; }
+@media (max-width: 640px) {
+  .fx__motif--event { width: 52%; height: 52%; top: 12px; right: 6px; }
+  .fx__motif--car { width: 50%; height: 56%; bottom: 46px; right: 10px; }
+  .fx__motif--tech { width: 36%; right: 16px; }
+  .fx__motif--saree .fx__motif-band { height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) { .fx__bulb { animation: none; } }
+
+/* Official social logos on the case-card links */
+.case__ig-icon .ico.brandmark { width: 22px; height: 22px; fill: #fff; stroke: none; }
+.case__ig--facebook .case__ig-icon { background: transparent; box-shadow: 0 6px 18px -6px rgba(8, 102, 255, 0.7); }
+.case__ig--facebook .case__ig-icon .ico.brandmark { width: 100%; height: 100%; }
+.case__ig-icon { overflow: hidden; }
+
+/* Touch: instant taps, no grey flash, gentle press feedback */
+a, button, .work-card, .filter, .case__ig { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.case__ig:active, .btn:active, .filter:active { scale: 0.97; }
+.vcard:active { scale: 0.985; }
+@media (prefers-reduced-motion: reduce) { .case__ig:active, .btn:active, .filter:active, .vcard:active { scale: none; } }
+.vcard { transition: scale 0.25s var(--ease); }
+/* Instagram: the app icon itself (gradient squircle + white glyph) */
+.case__ig--instagram .case__ig-icon {
+  border-radius: 11px;
+  background:
+    radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+  box-shadow: 0 6px 16px -6px rgba(214, 36, 159, 0.65), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.case__ig--instagram .case__ig-icon .ico.brandmark { width: 24px; height: 24px; }
+.case__ig--facebook .case__ig-icon { border-radius: 50%; }
+
+/* ==========================================================================
+   Case artwork v4: shaded illustrations + one-time entrance motion (.is-live)
+   ========================================================================== */
+.fx__motif--saree { inset: auto 0 0 0; top: auto; width: 100%; height: 74%; opacity: 1; }
+.fx__motif--event { top: 6px; right: 6px; width: 62%; height: 62%; }
+.fx__motif--car { right: 10px; bottom: 42px; width: 64%; height: 66%; overflow: visible; }
+.fx__motif--tech { right: 5%; width: 44%; height: 76%; }
+@media (max-width: 640px) {
+  .fx__motif--event { width: 56%; height: 56%; }
+  .fx__motif--car { width: 54%; height: 58%; bottom: 44px; }
+  .fx__motif--tech { width: 38%; right: 14px; }
+  .fx__motif--saree { height: 60%; }
+}
+.mo-check { stroke-dasharray: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* resting state before the card is seen */
+  .case:not(.is-live) .mo-drape { opacity: 0; transform: translateY(40px); }
+  .case:not(.is-live) .mo-car { opacity: 0; transform: translateX(90px); }
+  .case:not(.is-live) .mo-seal { opacity: 0; transform: scale(0.4); }
+  .case:not(.is-live) .mo-check { stroke-dashoffset: 1; }
+  .case:not(.is-live) .mo-beam { opacity: 0; }
+  .case:not(.is-live) .mo-lamp, .case:not(.is-live) .mo-halo { opacity: 0.12; }
+  .case:not(.is-live) .mo-bokeh { opacity: 0; }
+  .case:not(.is-live) .mo-pins, .case:not(.is-live) .mo-glow { opacity: 0; }
+
+  /* Radee Sarees: silk drape rises, light runs along the zari border */
+  .is-live .mo-drape { animation: moRise 1.1s cubic-bezier(0.2, 0.7, 0.1, 1) both; }
+  .is-live .fx__motif--saree .mo-sheen { animation: moSweepWide 1.6s ease-in-out 1s both; }
+  /* RS Verified Cars: car drives in, wheels turn, headlight comes on, seal stamps */
+  .is-live .mo-car { animation: moDrive 1.3s cubic-bezier(0.16, 0.8, 0.2, 1) both; }
+  .is-live .mo-wheel { animation: moSpin 1.3s cubic-bezier(0.16, 0.8, 0.2, 1) both; }
+  .is-live .mo-beam { animation: moBeam 1s ease 1.15s both; }
+  .is-live .mo-seal { animation: moStamp 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) 1.2s both; }
+  .is-live .mo-check { animation: moDraw 0.45s ease-out 1.55s both; }
+  /* Maguvaa: lights switch on one by one with a small flicker */
+  .is-live .mo-lamp, .is-live .mo-halo { animation: moFlicker 0.9s ease-out var(--d, 0s) both; }
+  .is-live .mo-bokeh { animation: moFade 1.6s ease 0.9s both; }
+  /* Sesritha: pins and glow power up, light sweeps over the chip */
+  .is-live .mo-pins { animation: moFade 0.6s ease 0.2s both; }
+  .is-live .mo-glow { animation: moPower 1.2s ease-out 0.5s both; transform-origin: 70px 70px; }
+  .is-live .fx__motif--tech .mo-sheen { animation: moSweep 1.1s ease-in-out 1s both; }
+}
+@keyframes moRise { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+@keyframes moDrive { from { opacity: 0; transform: translateX(90px); } 25% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes moSpin { from { transform: rotate(600deg); } to { transform: rotate(0deg); } }
+@keyframes moBeam { 0% { opacity: 0; } 30% { opacity: 1; } 45% { opacity: 0.35; } 60%, 100% { opacity: 0.9; } }
+@keyframes moStamp { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes moDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes moFlicker { 0% { opacity: 0.12; } 40% { opacity: 1; } 55% { opacity: 0.35; } 70%, 100% { opacity: 1; } }
+@keyframes moFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes moPower { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+@keyframes moSweep { from { transform: rotate(20deg) translateX(0); } to { transform: rotate(20deg) translateX(130px); } }
+@keyframes moSweepWide { from { transform: translateX(0); } to { transform: translateX(480px); } }
+
+/* Artwork blended into the panel background: larger, faded at the edges, sitting under the numbers */
+.mo-beam { display: none; }
+.fx__motif--saree {
+  height: 82%; opacity: 0.92;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 42%); mask-image: linear-gradient(to bottom, transparent 0%, #000 42%);
+}
+.fx__motif--event {
+  top: -2px; right: 0; width: 100%; height: 72%; opacity: 0.95;
+  -webkit-mask-image: linear-gradient(to left, #000 55%, transparent 100%); mask-image: linear-gradient(to left, #000 55%, transparent 100%);
+}
+.fx__motif--car {
+  right: -16%; bottom: 30px; width: 96%; height: 82%; opacity: 0.5;
+  -webkit-mask-image: linear-gradient(to left, #000 35%, transparent 92%); mask-image: linear-gradient(to left, #000 35%, transparent 92%);
+}
+.fx__motif--tech {
+  right: -16%; top: 50%; width: 80%; height: 96%; opacity: 0.5;
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 100%); mask-image: radial-gradient(closest-side, #000 55%, transparent 100%);
+}
+@media (max-width: 640px) {
+  .fx__motif--event { width: 100%; height: 66%; }
+  .fx__motif--car { right: -10%; width: 80%; height: 78%; bottom: 36px; }
+  .fx__motif--tech { right: -10%; width: 62%; height: 100%; }
+  .fx__motif--saree { height: 70%; }
+}
+.fx__motif--car { right: -7%; }
+@media (max-width: 640px) {
+  .fx__motif--event { -webkit-mask-image: linear-gradient(to left, #000 38%, transparent 66%); mask-image: linear-gradient(to left, #000 38%, transparent 66%); }
+  .fx__motif--car { right: -4%; }
+}
+
+/* Text side and artwork side blend into each other (no hard edge) */
+.case .case__visual { border-left: 0; }
+.case .case__visual::before {
+  content: ''; position: absolute; z-index: 1; pointer-events: none;
+  left: 0; top: 0; bottom: 0; width: 46%;
+  background: linear-gradient(to right, #111114 0%, rgba(17, 17, 20, 0.82) 22%, rgba(17, 17, 20, 0.35) 58%, transparent 100%);
+}
+.case .case__info {
+  background: linear-gradient(to right, transparent 35%, rgba(255, 255, 255, 0.012) 70%, var(--tcwash, rgba(255, 122, 26, 0.07)) 100%);
+}
+.case--violet { --tcwash: rgba(244, 143, 192, 0.07); }
+.case--steel { --tcwash: rgba(98, 214, 171, 0.06); }
+.case--blue { --tcwash: rgba(108, 196, 245, 0.07); }
+.case--brand { --tcwash: rgba(163, 34, 63, 0.12); }
+@media (max-width: 640px) {
+  .case .case__visual { border-bottom: 0; }
+  .case .case__visual::before {
+    left: 0; right: 0; top: auto; bottom: 0; width: auto; height: 34%;
+    background: linear-gradient(to top, #111114 0%, rgba(17, 17, 20, 0.7) 35%, transparent 100%);
+  }
+  .case .case__info { background: linear-gradient(to bottom, var(--tcwash, rgba(255, 122, 26, 0.07)) 0%, transparent 55%); }
+}
+
+/* Seamless blend: each artwork panel starts in the card's own colour on its inner edge
+   and only picks up its tone towards the outer edge, so there is no visible seam. */
+.case .art.art--leads, .case .art.art--leads.tone--steel, .case .art.art--leads.tone--blue {
+  background:
+    radial-gradient(85% 95% at 100% 35%, var(--tglow), transparent 72%),
+    linear-gradient(to right, #111114 0%, var(--tbg1) 55%, var(--tbg2) 100%);
+}
+.case .art.art--growth {
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(255, 122, 26, 0.2), transparent 62%),
+    linear-gradient(to right, #111114 0%, #22080f 50%, #1a070d 100%);
+}
+.case .case__visual::before { width: 58%; background: linear-gradient(to right, #111114 0%, rgba(17, 17, 20, 0.75) 30%, rgba(17, 17, 20, 0.3) 62%, transparent 100%); }
+.case .case__inner { background: #111114; }
+@media (max-width: 640px) {
+  .case .art.art--leads, .case .art.art--leads.tone--steel, .case .art.art--leads.tone--blue {
+    background:
+      radial-gradient(90% 90% at 100% 0%, var(--tglow), transparent 72%),
+      linear-gradient(to bottom, var(--tbg1) 0%, var(--tbg2) 55%, #111114 100%);
+  }
+  .case .art.art--growth { background: radial-gradient(80% 90% at 100% 0%, rgba(255, 122, 26, 0.2), transparent 62%), linear-gradient(to bottom, #22080f 0%, #1a070d 55%, #111114 100%); }
+  .case .case__visual::before { width: auto; height: 40%; background: linear-gradient(to top, #111114 0%, rgba(17, 17, 20, 0.6) 40%, transparent 100%); }
+}
+
+/* Radee Sarees: readable numbers on the maroon silk (white figures, frosted badge, rose accent) */
+.case--brand { --tc: #f5b3c2; --tcwash: rgba(163, 34, 63, 0.12); }
+.case .art--growth .fx__metric > span:last-child, .case .art--growth .fx__metric b { color: #fff; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); }
+.case .art--growth .fx__from { color: rgba(255, 255, 255, 0.62); }
+.case .art--growth .fx__arrow { color: rgba(255, 255, 255, 0.75); }
+.case .art--growth .fx__label { color: rgba(255, 255, 255, 0.9); }
+.case .art--growth .fx__label .ico { color: #f5b3c2; }
+.case .art--growth .fx__chip {
+  color: #fff; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.6); font-weight: 600;
+}
+.case .art--growth .fx__chip .ico { color: #f5b3c2; }
+.case .art.art--growth {
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(245, 179, 194, 0.12), transparent 62%),
+    linear-gradient(to right, #111114 0%, #22080f 50%, #1a070d 100%);
+}
+@media (max-width: 640px) {
+  .case .art.art--growth { background: radial-gradient(80% 90% at 100% 0%, rgba(245, 179, 194, 0.12), transparent 62%), linear-gradient(to bottom, #22080f 0%, #1a070d 55%, #111114 100%); }
+}
+/* keep the top of the silk darker so the numbers sit on a calm area */
+.fx__motif--saree { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 55%); mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.35) 30%, #000 55%); }
+
+/* Phones: social link centred under the card text */
+@media (max-width: 640px) {
+  .case .case__actions { display: flex; justify-content: center; width: 100%; }
 }

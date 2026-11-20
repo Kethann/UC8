@@ -15,51 +15,52 @@ window.UC8_CLIENTS = []; // Add { name, img } entries to show this section.
    Optional: thumb: 'assets/work/xyz.jpg' (16:10) and link: 'https://…' */
 window.UC8_PROJECTS = [
   {
-    featured: true, art: 'growth', category: 'Social & Content',
+    featured: true, art: 'growth', motif: 'saree', category: 'Social & Content',
     title: 'Radee Sarees', sub: 'Instagram page management',
-    line: 'Grew a saree brand’s Instagram from **4K to 38K followers**, a **9.5× growth** in audience.',
+    line: 'We run the Instagram for this saree label. The page went from **4K to 38K followers**, nearly ten times its size.',
     tags: ['Instagram management', 'Content & posting', 'Page growth'],
     metric: { from: 4, to: 38, unit: 'K', label: 'Instagram followers' }, badge: '9.5× growth',
     instagram: { url: 'https://www.instagram.com/radeesarees/?hl=en', handle: '@radeesarees' },
-    story: 'We manage the Radee Sarees Instagram page: planning, posting and keeping it active every week. The page grew from 4K to 38K followers.',
+    story: 'We look after the Radee Sarees Instagram every week. We plan the posts, shoot and edit them, and keep the page active. It grew from 4K to 38K followers.',
     results: ['Followers: 4K → 38K', '9.5× audience growth', 'Ongoing page management'],
   },
   /* Lead-generation case template (art: 'leads'):
      metrics: up to 2 results, each { to, unit, label, icon } or a range { range: [from, to], label, icon }
      icon: 'team' | 'chat' | 'car'      tone: 'violet' | 'steel' | 'blue' (background colour of the result panel)
+     motif: background artwork 'saree' | 'event' | 'car' | 'tech'
      pings: the small tags that pop in on the result panel
      social: { net: 'instagram' | 'facebook', url, handle } */
   {
-    featured: true, art: 'leads', tone: 'violet', category: 'Campaigns',
+    featured: true, art: 'leads', motif: 'event', tone: 'violet', category: 'Campaigns',
     title: 'Maguvaa Event Management', sub: 'Lead generation',
-    line: 'Lead generation for an events company: **250+ enquiries** and **100+ leads**.',
+    line: 'We ran the campaigns for this event management company. They brought in **250+ enquiries** and **100+ leads**.',
     tags: ['Lead generation', 'Campaigns', 'Events'],
-    metrics: [{ to: 250, unit: '+', label: 'Enquiries', icon: 'chat' }, { to: 100, unit: '+', label: 'Leads generated', icon: 'team' }],
+    metrics: [{ to: 250, unit: '+', label: 'Enquiries', icon: 'chat' }, { to: 100, unit: '+', label: 'Leads', icon: 'team' }],
     pings: ['Enquiry', 'New lead', 'Enquiry'],
-    story: 'We ran lead generation for Maguvaa Event Management. The campaigns brought in 250+ enquiries and 100+ leads for their events business.',
-    results: ['250+ enquiries', '100+ leads generated', 'Lead generation for an events brand'],
+    story: 'Maguvaa plans and manages events. We ran their lead campaigns, which brought in more than 250 enquiries and over 100 leads.',
+    results: ['250+ enquiries', '100+ leads', 'Lead campaigns for an events business'],
   },
   {
-    featured: true, art: 'leads', tone: 'steel', category: 'Campaigns',
+    featured: true, art: 'leads', motif: 'car', tone: 'steel', category: 'Campaigns',
     title: 'RS Verified Cars', sub: 'Instagram marketing & sales',
-    line: 'Instagram marketing for a pre-owned car dealer: **10-12 cars sold every month** and **100+ enquiries**.',
+    line: 'A pre-owned car dealer that sells through Instagram. The page brings in **100+ enquiries** and **10‑12 sales a month**.',
     tags: ['Instagram marketing', 'Lead generation', 'Car sales'],
-    metrics: [{ range: [10, 12], label: 'Cars sold / month', icon: 'car' }, { to: 100, unit: '+', label: 'Enquiries', icon: 'chat' }],
+    metrics: [{ range: [10, 12], label: 'Sales a month', icon: 'car' }, { to: 100, unit: '+', label: 'Enquiries', icon: 'chat' }],
     pings: ['Enquiry', 'Test drive', 'Sold'],
     social: { net: 'instagram', url: 'https://www.instagram.com/raja_mallela/', handle: '@raja_mallela' },
-    story: 'We run Instagram marketing for RS Verified Cars. The page now brings 100+ enquiries and helps close 10-12 car sales every month.',
+    story: 'We handle Instagram for RS Verified Cars. Buyers find the cars on the page, and it now brings in 100+ enquiries and 10-12 sales every month.',
     results: ['10-12 car sales every month', '100+ enquiries', 'Ongoing Instagram marketing'],
   },
   {
-    featured: true, art: 'leads', tone: 'blue', category: 'Campaigns',
+    featured: true, art: 'leads', motif: 'tech', tone: 'blue', category: 'Campaigns',
     title: 'Sesritha Technology', sub: 'Facebook lead generation · Nellore',
-    line: 'Facebook lead generation for a Nellore tech company that brought in **200+ leads**.',
+    line: 'Facebook campaigns for a tech company in Nellore, which brought in **200+ leads**.',
     tags: ['Facebook marketing', 'Lead generation', 'Campaigns'],
-    metrics: [{ to: 200, unit: '+', label: 'Leads generated', icon: 'team' }],
+    metrics: [{ to: 200, unit: '+', label: 'Leads', icon: 'team' }],
     pings: ['New lead', 'New lead', 'New lead'],
-    social: { net: 'facebook', url: 'https://www.facebook.com/sesrithat', handle: 'Sesritha Technology' },
-    story: 'We ran Facebook lead generation for Sesritha Technology in Nellore and brought in 200+ leads.',
-    results: ['200+ leads generated', 'Facebook lead generation'],
+    social: { net: 'facebook', url: 'https://www.facebook.com/sesrithat', handle: '@sesrithat' },
+    story: 'Sesritha Technology is based in Nellore. We ran their Facebook campaigns, which brought in more than 200 leads.',
+    results: ['200+ leads', 'Facebook campaigns'],
   },
 ];
 
