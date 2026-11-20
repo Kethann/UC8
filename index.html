@@ -11,9 +11,9 @@
   <link rel="apple-touch-icon" href="assets/uc8-apple-touch-icon.png" />
   <link rel="manifest" href="site.webmanifest" />
 
-  <!-- The intro plays on every visit and every refresh (set before first paint so the page never flashes) -->
+  <!-- Set intro state before rendering. -->
   <script>
-    // skip the intro only when arriving from another page with a section link (e.g. team.html -> index.html#work)
+    // Skip the intro for section links.
     document.documentElement.classList.add('js');
     if (location.hash.length < 2) document.documentElement.classList.add('intro-active');
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -74,12 +74,12 @@
   </div>
 </div>
 
-<!-- ============ GLOBAL BACKGROUND (moving line texture + dust + grain) ============ -->
+<!-- Background -->
 <canvas id="bg" class="bg-canvas" aria-hidden="true"></canvas>
 <div class="bg-vignette" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
-<!-- ============ TOP SCROLL PROGRESS (replaces the side scrollbar) ============ -->
+<!-- Scroll progress -->
 <div class="scroll-progress" aria-hidden="true"><span id="scrollProgress"></span></div>
 
 <!-- ============ TOP NAV ============ -->
@@ -137,7 +137,7 @@
     </div>
   </section>
 
-  <!-- services ticker (fills the space between hero and about) -->
+  <!-- Services ticker -->
   <div class="ticker" aria-label="Our services">
     <div class="ticker__track">
       <div class="ticker__group"><span class="ticker__item">Digital Marketing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Website Development</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Content Creation</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Personal Branding</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">SEO Optimization</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Editing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Designing Services</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Shooting</span><i class="ticker__star" aria-hidden="true">✦</i></div>
@@ -194,7 +194,7 @@
         </div>
       </div>
       <div class="work__board" id="workBoard">
-        <!-- Projects — rendered from js/data.js (UC8_PROJECTS) -->
+        <!-- Projects load from data.js. -->
         <div class="work__grid" id="workGrid"></div>
       </div>
     </div>
@@ -277,7 +277,7 @@
           </div>
         </div>
 
-        <!-- Form: until FORM_ENDPOINT is set in js/main.js, submitting opens the visitor's email app addressed to unicreate9999@gmail.com. -->
+        <!-- Uses email until a form endpoint is set. -->
         <form class="glass form" id="contactForm" novalidate data-reveal>
           <div class="form__row">
             <label class="field"><span>Name *</span><input name="name" type="text" autocomplete="name" required placeholder="Your full name" /><em class="field__err"></em></label>

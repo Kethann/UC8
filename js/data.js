@@ -6,7 +6,7 @@
 /* ---------- CLIENT LOGOS (PLACEHOLDER) ----------
    Replace each entry with { name: 'Brand', img: 'assets/clients/brand.svg' }.
    When `img` is set, the image is used instead of the styled wordmark. */
-window.UC8_CLIENTS = []; // empty = section stays hidden. Add { name, img } entries when real logos are ready.
+window.UC8_CLIENTS = []; // Add { name, img } entries to show this section.
 
 /* ---------- PROJECTS ----------
    featured: true  → real client case study (wide card with an animated result)

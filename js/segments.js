@@ -4,11 +4,11 @@
    heavier strokes, tight joints, evenly justified "UniCre8" label. */
 (function () {
   const NS = 'http://www.w3.org/2000/svg';
-  const W = 100;      // digit width
-  const H = 128;      // digit height  (≈ 0.78 ratio, like the brand mark)
-  const T = 15;       // stroke thickness
-  const G = 1.8;      // gap at segment joints (tight, clean)
-  const GAP = 30;     // space between digits
+  const W = 100;      // Digit width
+  const H = 128;      // Digit height
+  const T = 15;       // Segment thickness
+  const G = 1.8;      // Segment gap
+  const GAP = 30;     // Space between digits
   const GLYPHS = { U: 'bcdef', C: 'adef', 8: 'abcdefg' }; // a top, b top-right, c bottom-right, d bottom, e bottom-left, f top-left, g middle
   let uid = 0;
 
@@ -96,7 +96,7 @@
 
   window.UC8Seg = { build };
 
-  // Static instances (nav, footer)
+  // Nav and footer logos
   document.querySelectorAll('[data-seglogo="nav"]').forEach((svg) => build(svg, { label: false }));
   document.querySelectorAll('[data-seglogo="footer"]').forEach((svg) => build(svg, { label: false }));
 })();

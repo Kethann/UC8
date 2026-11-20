@@ -23,7 +23,7 @@
   ];
   const STEPS = 64;
 
-  /* dust */
+  /* Dust particles */
   let dust = [];
   function makeDust() {
     const n = mobile ? 34 : 70;
@@ -98,7 +98,7 @@
     ctx.lineWidth = mobile ? 0.6 : 0.7;
     for (const r of RIBBONS) drawRibbon(r, T, smoothS);
 
-    // orange dust with parallax
+    // Moving dust
     ctx.globalCompositeOperation = 'lighter';
     for (const p of dust) {
       p.tw += dt * p.sp;

@@ -8,7 +8,7 @@
   const hasGSAP = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
   const isHome = !!document.getElementById('home');   // index.html (hero, work, services…) vs team.html
 
-  /* Optional: set to your Formspree / backend URL to receive form submissions */
+  /* Form endpoint */
   const FORM_ENDPOINT = '';
   const STUDIO_EMAIL = 'unicreate9999@gmail.com';
 
@@ -255,7 +255,7 @@
     });
   });
 
-  /* animate the case-study results once the light table has resolved into the grid */
+  /* Animate case-study results after the grid loads. */
   (function results() {
     const stageEl = $('#workStage');
     let done = false;
@@ -443,7 +443,7 @@
           const r = await fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
           if (!r.ok) throw new Error('bad status');
         } else {
-          // no backend yet: open the visitor's email app with the brief filled in
+          // Open an email draft when no endpoint is set.
           const body = [
             `Name: ${data.name}`, `Email: ${data.email}`, data.phone ? `Phone: ${data.phone}` : '', data.company ? `Company / Brand: ${data.company}` : '',
             `Project type: ${data.type}`, data.timeline ? `Timeline: ${data.timeline}` : '', '', data.message,
@@ -464,7 +464,7 @@
     });
   })();
 
-  /* UC8 logo (nav + footer) fluctuates at random like a real segment display */
+  /* Give the logo a small flicker. */
   (function logoFlicker() {
     if (reduce || !Element.prototype.animate) return;
     const logos = $$('.seglogo--nav, .seglogo--footer');
@@ -501,7 +501,7 @@
   gsap.set(heroLines, { yPercent: 110 });
   gsap.set(heroBits, { opacity: 0, y: 26 });
   gsap.set('[data-hero-visual]', { opacity: 0, scale: 0.86 });
-  // replaying the intro: freeze scroll, jump to top behind the overlay, re-run hero entrance after
+  // Reset the page when the intro restarts.
   window.addEventListener('uc8:introstart', () => {
     lenis && lenis.stop();
     setTimeout(() => { lenis ? lenis.scrollTo(0, { immediate: true, force: true }) : window.scrollTo(0, 0);
@@ -524,13 +524,13 @@
   gsap.to('.hero__copy', { yPercent: -8, opacity: 0.35, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
   gsap.to('.hero__visual', { yPercent: 14, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
 
-  // arriving from another page with a section link (e.g. team.html → index.html#work): go straight there
+  // Open section links directly.
   if (location.hash.length > 1 && window.UC8_INTRO_DONE) {
     const target = location.hash, el = $(target);
-    // tidy the address bar so a later refresh plays the intro as usual
+    // Remove the hash after scrolling.
     if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
     if (el) {
-      // jump, then re-check a few times while fonts, images and pinned sections finish laying out
+      // Check again after the page settles.
       let userMoved = false;   // never fight the visitor: stop correcting once they scroll themselves
       ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { userMoved = true; }, { once: true, passive: true }));
       const jump = () => {
@@ -552,7 +552,7 @@
   if (grid) {
   const stage = $('#workStage'), board = $('#workBoard'), table = $('.work__table', grid);
   const cards = () => $$('.work-card', grid).filter((c) => !c.hidden);
-  // deterministic pseudo-random per card
+  // Repeatable value for each card
   const rnd = (i, k) => { const s = Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453; return s - Math.floor(s); };
   function scatter(el, spreadX, spreadY) {
     const i = +el.dataset.i, gw = grid.clientWidth, gh = grid.clientHeight;
@@ -590,7 +590,7 @@
     return () => stage.classList.remove('is-resolved');
   });
 
-  // filters — only show tabs for categories that have projects (new ones appear automatically as work is added)
+  // Show filters for available project categories.
   const usedCats = new Set(PROJ.map((p) => p.category));
   $$('.filter').forEach((b) => { if (b.dataset.filter !== 'all' && !usedCats.has(b.dataset.filter)) b.hidden = true; });
   $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
@@ -619,7 +619,7 @@
   });
   }
 
-  /* created after the pinned work section so their start/end include pin spacing */
+  /* Create after the work section is pinned. */
   /* ------------------------------------------------------------------
      Generic reveals
      ------------------------------------------------------------------ */
@@ -655,7 +655,7 @@
   setActive('home');
   }
 
-  // refresh after fonts / images settle
+  // Refresh after fonts and images load.
   if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());
   window.addEventListener('load', () => ScrollTrigger.refresh());
 })();
