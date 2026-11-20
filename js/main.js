@@ -137,6 +137,45 @@
   $$('[data-split]').forEach((el) => { el._words = splitWords(el); });
 
   /* ------------------------------------------------------------------
+     One-line headings: every main section heading (not the hero, not the
+     statement) stays on a single line. It keeps its designed size where it
+     fits and scales down just enough on narrower screens.
+     ------------------------------------------------------------------ */
+  (function fitHeadings() {
+    const heads = $$('.h2, .contact__title, .team-cta__title');
+    if (!heads.length) return;
+    heads.forEach((el) => el.classList.add('fit-line'));
+    const box = (el) => {                      // the width the heading may use
+      const b = el.closest('.team-cta__box, .container') || el.parentElement;
+      const cs = getComputedStyle(b);
+      return b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    };
+    let lastW = -1;
+    function fit() {
+      const vw = document.documentElement.clientWidth;
+      if (vw === lastW) return;                // ignore mobile URL-bar height changes
+      lastW = vw;
+      heads.forEach((el) => {
+        el.style.fontSize = '';
+        const max = parseFloat(getComputedStyle(el).fontSize);
+        // measure the natural one-line width with an invisible copy (unaffected by animations)
+        const c = el.cloneNode(true);
+        c.removeAttribute('id');
+        c.style.cssText = `position:absolute;left:-9999px;top:0;visibility:hidden;width:auto;max-width:none;white-space:nowrap;font-size:${max}px`;
+        el.parentNode.appendChild(c);
+        const natural = c.offsetWidth;
+        c.remove();
+        const avail = box(el);
+        if (natural > avail && natural > 0) el.style.fontSize = `${Math.floor((max * avail / natural) * 0.985 * 10) / 10}px`;
+      });
+    }
+    fit();
+    addEventListener('resize', fit, { passive: true });
+    addEventListener('orientationchange', () => { lastW = -1; fit(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastW = -1; fit(); if (window.ScrollTrigger) ScrollTrigger.refresh(); });
+  })();
+
+  /* ------------------------------------------------------------------
      Content rendering: clients, projects, services
      ------------------------------------------------------------------ */
   // clients
@@ -161,21 +200,32 @@
           <span class="fx__chip"><svg class="ico"><use href="#i-arrow-ur"/></svg>${p.badge}</span>
         </div>
         <svg class="fx__chart" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true">
-          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4c56a" stop-opacity=".45"/><stop offset="1" stop-color="#f4c56a" stop-opacity="0"/></linearGradient></defs>
+          <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7a1a" stop-opacity=".45"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></linearGradient></defs>
           <path class="fx__area" d="M0 84 C40 82 60 80 90 74 S140 66 165 56 S215 34 240 24 S280 8 300 4 L300 90 L0 90Z" fill="url(#gfill)"/>
-          <path class="fx__line" pathLength="1" d="M0 84 C40 82 60 80 90 74 S140 66 165 56 S215 34 240 24 S280 8 300 4" fill="none" stroke="#f4c56a" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+          <path class="fx__line" pathLength="1" d="M0 84 C40 82 60 80 90 74 S140 66 165 56 S215 34 240 24 S280 8 300 4" fill="none" stroke="#ff7a1a" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
         </svg>
       </div>`;
     }
-    return `<div class="art art--feat art--leads">
+    // Lead-generation template: one or two animated results + funnel + popping tags
+    const stats = p.metrics || (m ? [{ to: m.to, unit: m.unit, label: m.label, icon: 'team' }] : []);
+    const num = (s) => s.range
+      ? `<b data-countto="${s.range[0]}">0</b>-<b data-countto="${s.range[1]}">0</b>`
+      : `<b data-countto="${s.to}">0</b>${s.unit || ''}`;
+    const pings = (p.pings || ['New lead', 'New lead', 'New lead']).slice(0, 3);
+    return `<div class="art art--feat art--leads tone--${p.tone || 'violet'}${stats.length > 1 ? ' is-multi' : ''}">
       <div class="fx">
-        <div class="fx__metric display"><span><b data-countto="${m.to}">0</b>${m.unit}</span></div>
-        <div class="fx__label mono"><svg class="ico"><use href="#i-team"/></svg>${m.label}</div>
+        ${stats.map((s) => `<div class="fx__stat">
+          <div class="fx__metric display"><span>${num(s)}</span></div>
+          <div class="fx__label mono"><svg class="ico"><use href="#i-${s.icon || 'team'}"/></svg>${esc(s.label)}</div>
+        </div>`).join('')}
       </div>
       <div class="fx__funnel" aria-hidden="true"><i style="--w:100%"></i><i style="--w:78%"></i><i style="--w:56%"></i><i style="--w:36%"></i></div>
-      <div class="fx__pings" aria-hidden="true"><span>New lead</span><span>New lead</span><span>New lead</span></div>
+      <div class="fx__pings" aria-hidden="true">${pings.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
     </div>`;
   }
+  // Instagram / Facebook link for a case study (older entries use `instagram: {url, handle}`)
+  const socialOf = (p) => p.social || (p.instagram ? { net: 'instagram', ...p.instagram } : null);
+  const NET = { instagram: 'Instagram', facebook: 'Facebook' };
   function thumbArt(p, i) {
     const h = p.hue, c1 = `hsl(${h} 85% 58%)`, c2 = `hsl(${(h + 40) % 360} 70% 30%)`;
     const style = `--h:${h};--c1:${c1};--c2:${c2}`;
@@ -202,22 +252,26 @@
     }
   }
   const PROJ = window.UC8_PROJECTS || [];
+  // Video edits are listed only on the "All work" page (work.html); the home page shows just the case-study table.
+  const ALL_WORK = document.body.dataset.page === 'work';
+  const VIDS = ALL_WORK ? (window.UC8_VIDEOS || []) : [];
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const grid = $('#workGrid');
   const caseCard = (p, i) => `
-    <article class="work-card work-card--featured case" data-cat="${p.category}" data-i="${i}">
+    <article class="work-card work-card--featured case${(p.metrics || []).length > 1 ? ' case--multi' : ''}" data-cat="${p.category}" data-i="${i}">
       <div class="work-card__inner case__inner">
         <div class="case__info">
           <span class="case__kicker mono"><i></i>Case study · ${p.category}</span>
           <h3 class="case__title display">${p.title}</h3>
           <p class="case__line">${(p.line || p.sub).replace(/\*\*(.+?)\*\*/g, '<mark>$1</mark>')}</p>
           ${p.tags ? `<ul class="case__tags">${p.tags.map((t) => `<li>${t}</li>`).join('')}</ul>` : ''}
-          ${p.instagram ? `<div class="case__actions">
-            <a class="case__ig" href="${p.instagram.url}" target="_blank" rel="noopener" aria-label="${p.title} on Instagram (opens in a new tab)">
-              <span class="case__ig-icon"><svg class="ico"><use href="#i-instagram"/></svg></span>
-              <span class="case__ig-text"><small>See the page</small>${p.instagram.handle}</span>
+          ${socialOf(p) ? ((s) => `<div class="case__actions">
+            <a class="case__ig case__ig--${s.net}" href="${s.url}" target="_blank" rel="noopener" aria-label="${esc(p.title)} on ${NET[s.net]} (opens in a new tab)">
+              <span class="case__ig-icon"><svg class="ico"><use href="#i-${s.net}"/></svg></span>
+              <span class="case__ig-text"><small>See the page</small>${esc(s.handle)}</span>
               <svg class="ico case__ig-arrow"><use href="#i-arrow-ur"/></svg>
             </a>
-          </div>` : ''}
+          </div>`)(socialOf(p)) : ''}
         </div>
         <div class="case__visual">${p.thumb ? `<img src="${p.thumb}" alt="${p.title}" loading="lazy" />` : featuredArt(p)}</div>
         <span class="work-card__pin" aria-hidden="true"></span>
@@ -244,13 +298,24 @@
           ${p.instagram ? `<a class="work-card__ig" href="${p.instagram.url}" target="_blank" rel="noopener" aria-label="${p.title} on Instagram (opens in a new tab)"><svg class="ico"><use href="#i-instagram"/></svg>${p.instagram.handle}<svg class="ico"><use href="#i-arrow-ur"/></svg></a>` : ''}
         </div>
       </div>
+    </article>`).join('') + VIDS.map((v, j) => `
+    <article class="work-card work-card--video${v.v ? '' : ' is-wide'}" data-cat="Video" data-i="${PROJ.length + j}">
+      <a class="work-card__inner vcard" href="https://drive.google.com/file/d/${encodeURIComponent(v.id)}/view" target="_blank" rel="noopener" aria-label="Play ${esc(v.title)} (${esc(v.cat)}) on Google Drive, opens in a new tab">
+        <img src="${v.thumb}" alt="" loading="lazy" decoding="async"${v.pos ? ` style="object-position:${v.pos}"` : ''} />
+        <span class="vcard__shade" aria-hidden="true"></span>
+        <span class="vcard__top" aria-hidden="true"><span class="vcard__cat mono">${esc(v.cat)}</span>${v.dur ? `<span class="vcard__dur mono">${v.dur}</span>` : ''}</span>
+        <span class="vcard__play" aria-hidden="true"><svg class="ico"><use href="#i-play"/></svg></span>
+        <span class="vcard__info"><strong>${esc(v.title)}</strong><small class="mono">${v.v ? 'Reel' : 'Film'}${v.dur ? ` · ${v.dur}` : ''}</small></span>
+        <span class="work-card__pin" aria-hidden="true"></span>
+      </a>
     </article>`).join('');
   $$('.work-card__link[data-project]', grid).forEach((a) => {
     const p = PROJ[+a.dataset.project];
     if (p.link) return;
     a.addEventListener('click', (e) => {
       e.preventDefault(); e.stopPropagation();
-      if (p.featured) openModal(`Case study · ${p.category}`, p.title, p.story, p.results, p.instagram && { href: p.instagram.url, label: `See ${p.instagram.handle} on Instagram` });
+      const so = socialOf(p);
+      if (p.featured) openModal(`Case study · ${p.category}`, p.title, p.story, p.results, so && { href: so.url, label: `See ${so.handle} on ${NET[so.net]}`, icon: so.net });
       else openModal(`${p.category} · ${p.year}`, p.title, `${p.sub}. Placeholder project: replace it with real work in js/data.js.`, ['Challenge', 'Approach', 'Results']);
     });
   });
@@ -306,7 +371,7 @@
   let lastFocus = null;
   function openModal(kicker, title, text, list, extra) {
     const ex = $('#modalExtra');
-    if (extra) { ex.href = extra.href; $('span', ex).textContent = extra.label; ex.hidden = false; }
+    if (extra) { ex.href = extra.href; $('span', ex).textContent = extra.label; const u = $('use', ex); if (u) u.setAttribute('href', '#i-' + (extra.icon || 'instagram')); ex.hidden = false; }
     else ex.hidden = true;
     $('#modalKicker').textContent = kicker;
     $('#modalTitle').textContent = title;
@@ -323,6 +388,7 @@
     lastFocus && lastFocus.focus && lastFocus.focus({ preventScroll: true });
   }
   if (modal) $$('[data-close]', modal).forEach((el) => el.addEventListener('click', (e) => { if (el.tagName !== 'A') { e.preventDefault(); } closeModal(); }));
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { if (modal && modal.classList.contains('is-open')) closeModal(); if (menu.classList.contains('is-open')) closeMenu(); }
   });
@@ -448,11 +514,11 @@
             `Name: ${data.name}`, `Email: ${data.email}`, data.phone ? `Phone: ${data.phone}` : '', data.company ? `Company / Brand: ${data.company}` : '',
             `Project type: ${data.type}`, data.timeline ? `Timeline: ${data.timeline}` : '', '', data.message,
           ].filter((l, i, arr) => l !== '' || arr[i - 1] !== '').join('\n');
-          window.location.href = `mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent('Project brief — ' + (data.company || data.name))}&body=${encodeURIComponent(body)}`;
+          window.location.href = `mailto:${STUDIO_EMAIL}?subject=${encodeURIComponent('Project brief: ' + (data.company || data.name))}&body=${encodeURIComponent(body)}`;
         }
         status.textContent = FORM_ENDPOINT
-          ? `Thanks ${data.name.split(' ')[0]} — brief received. We'll be in touch soon.`
-          : `Thanks ${data.name.split(' ')[0]} — your email app should open with the brief ready to send to ${STUDIO_EMAIL}.`;
+          ? `Thanks ${data.name.split(' ')[0]}, brief received. We'll be in touch soon.`
+          : `Thanks ${data.name.split(' ')[0]}, your email app should open with the brief ready to send to ${STUDIO_EMAIL}.`;
         status.className = 'form__status mono is-ok';
         f.reset(); upd();
       } catch (err) {
@@ -505,7 +571,7 @@
      Without GSAP: show everything, keep filters working, and stop here
      ------------------------------------------------------------------ */
   if (!hasGSAP) {
-    const usedCats = new Set((window.UC8_PROJECTS || []).map((p) => p.category));
+    const usedCats = new Set((window.UC8_PROJECTS || []).map((p) => p.category)); if (VIDS.length) usedCats.add('Video');
     $$('.filter').forEach((b) => { if (b.dataset.filter !== 'all' && !usedCats.has(b.dataset.filter)) b.hidden = true; });
     $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
       $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', String(b === btn)); });
@@ -587,14 +653,14 @@
   const mm = gsap.matchMedia();
   mm.add({ desk: '(min-width: 900px)', mob: '(max-width: 899px)', reduce: '(prefers-reduced-motion: reduce)' }, (ctx) => {
     const { desk, reduce: rm } = ctx.conditions;
-    if (rm) { stage.classList.add('is-resolved'); gsap.from(cards(), { opacity: 0, y: 30, stagger: 0.05, scrollTrigger: { trigger: grid, start: 'top 85%', once: true } }); return; }
+    if (rm || ALL_WORK) { stage.classList.add('is-resolved'); if (!rm) gsap.from(cards(), { opacity: 0, y: 30, duration: 0.6, ease: 'power2.out', stagger: 0.04, clearProps: 'opacity,transform', scrollTrigger: { trigger: grid, start: 'top 90%', once: true } }); return; }
 
     // Pin just below the fixed nav so the heading and filters are never hidden behind it.
     const navH = () => (nav ? nav.offsetHeight : 0);
     const fits = desk && stage.offsetHeight <= window.innerHeight - navH() + 4;
     const sx = desk ? 0.5 : 0.36, sy = desk ? 0.3 : 0.16;
     const st = fits
-      ? { trigger: stage, start: () => `top ${navH()}px`, end: `+=${Math.min(110, 60 + PROJ.length * 8)}%`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
+      ? { trigger: stage, start: () => `top ${navH()}px`, end: `+=${Math.min(110, 60 + (PROJ.length + VIDS.length) * 8)}%`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
       : { trigger: board, start: 'top 92%', end: desk ? 'top 25%' : 'top 35%', scrub: 0.5, invalidateOnRefresh: true };
     st.onUpdate = (self) => stage.classList.toggle('is-resolved', self.progress > 0.9);
     st.onLeave = () => stage.classList.add('is-resolved');
@@ -616,7 +682,7 @@
   });
 
   // Show filters for available project categories.
-  const usedCats = new Set(PROJ.map((p) => p.category));
+  const usedCats = new Set(PROJ.map((p) => p.category)); if (VIDS.length) usedCats.add('Video');
   $$('.filter').forEach((b) => { if (b.dataset.filter !== 'all' && !usedCats.has(b.dataset.filter)) b.hidden = true; });
   $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
     $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', String(b === btn)); });
