@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# source photos, installers and other large files (keep only web-ready assets)
+*.exe
+*.HEIC
+*.heic
+*.psd
+*.ai
+*.zip
+*.jpg
+*.JPG
+*.jpeg
+*.JPEG

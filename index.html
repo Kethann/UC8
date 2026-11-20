@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>UniCre8 — Digital Marketing, Content &amp; Web Studio</title>
+  <meta name="description" content="UniCre8 (UC8) is a digital marketing, content and web studio. Strategy, shoots, edits, design and websites built to make brands impossible to scroll past." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="assets/uc8-favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/uc8-favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/uc8-apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <!-- The intro plays on every visit and every refresh (set before first paint so the page never flashes) -->
+  <script>
+    // skip the intro only when arriving from another page with a section link (e.g. team.html -> index.html#work)
+    document.documentElement.classList.add('js');
+    if (location.hash.length < 2) document.documentElement.classList.add('intro-active');
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=1.1.1" />
+</head>
+<body>
+
+<!-- ============ SVG ICON SPRITE ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- UC8 two-tone icons: .d = soft fill, strokes = line -->
+    <symbol id="u-marketing" viewBox="0 0 24 24"><circle class="d" cx="10.5" cy="13.5" r="7.5"/><circle cx="10.5" cy="13.5" r="7.5"/><circle cx="10.5" cy="13.5" r="3.6"/><circle class="f" cx="10.5" cy="13.5" r="1.2"/><path d="M13 11l7.5-7.5"/><path d="M17.2 3.2h3.6v3.6"/></symbol>
+    <symbol id="u-web" viewBox="0 0 24 24"><rect class="d" x="2.5" y="4" width="19" height="16" rx="2.5"/><rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="M2.5 8.5h19"/><circle class="f" cx="5.4" cy="6.3" r=".8"/><circle class="f" cx="7.8" cy="6.3" r=".8"/><path d="m9.5 12-2.3 2.25 2.3 2.25"/><path d="m14.5 12 2.3 2.25-2.3 2.25"/><path d="m12.9 11.3-1.8 5.9"/></symbol>
+    <symbol id="u-content" viewBox="0 0 24 24"><rect class="d" x="5" y="2.5" width="11" height="19" rx="2.6"/><rect x="5" y="2.5" width="11" height="19" rx="2.6"/><path class="f" d="M9 9.2v5.6l4.6-2.8z"/><path d="M8.8 18.4h3.4"/><path d="M19.5 3.5v3.2M17.9 5.1h3.2"/><path d="M20 10.5v1.8M19.1 11.4h1.8"/></symbol>
+    <symbol id="u-brand" viewBox="0 0 24 24"><rect class="d" x="3" y="3" width="18" height="18" rx="5.5"/><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="10" r="3"/><path d="M6.8 18.6c.9-2.6 2.9-4 5.2-4s4.3 1.4 5.2 4"/><path class="f" d="m17.6 4.7.6 1.3 1.4.2-1 1 .2 1.4-1.2-.7-1.3.7.3-1.4-1-1 1.4-.2z"/></symbol>
+    <symbol id="u-seo" viewBox="0 0 24 24"><circle class="d" cx="10.2" cy="10.2" r="7"/><circle cx="10.2" cy="10.2" r="7"/><path d="M15.4 15.4 21 21"/><path d="M7.4 13v-1.6M10.2 13V7.6M13 13v-3.2"/></symbol>
+    <symbol id="u-edit" viewBox="0 0 24 24"><rect class="d" x="2.5" y="4.5" width="9" height="4" rx="1.2"/><rect x="2.5" y="4.5" width="9" height="4" rx="1.2"/><rect x="7.5" y="10" width="12" height="4" rx="1.2"/><rect class="d" x="2.5" y="15.5" width="7" height="4" rx="1.2"/><rect x="2.5" y="15.5" width="7" height="4" rx="1.2"/><path d="M14.5 2.5v19"/><path class="f" d="M12.6 2.2h3.8l-1.9 2.2z"/></symbol>
+    <symbol id="u-design" viewBox="0 0 24 24"><path d="M3.5 18.5C7 18.5 8 6 12 6s5 12.5 8.5 12.5"/><path d="M7.5 6h9"/><rect class="d" x="10.4" y="4.4" width="3.2" height="3.2" rx=".6"/><rect x="10.4" y="4.4" width="3.2" height="3.2" rx=".6"/><circle class="f" cx="7.5" cy="6" r="1.2"/><circle class="f" cx="16.5" cy="6" r="1.2"/><rect class="d" x="2" y="17" width="3" height="3" rx=".6"/><rect x="2" y="17" width="3" height="3" rx=".6"/><rect class="d" x="19" y="17" width="3" height="3" rx=".6"/><rect x="19" y="17" width="3" height="3" rx=".6"/></symbol>
+    <symbol id="u-shoot" viewBox="0 0 24 24"><circle class="d" cx="6.5" cy="6.5" r="2.8"/><circle cx="6.5" cy="6.5" r="2.8"/><circle class="d" cx="12.6" cy="6.5" r="2.8"/><circle cx="12.6" cy="6.5" r="2.8"/><rect class="d" x="2.5" y="10.5" width="13" height="9" rx="1.8"/><rect x="2.5" y="10.5" width="13" height="9" rx="1.8"/><path d="m15.5 13.2 5.5-2.7v9l-5.5-2.7"/><circle class="f" cx="5.5" cy="13.4" r=".9"/></symbol>
+    <symbol id="u-brief" viewBox="0 0 24 24"><rect class="d" x="4.5" y="4" width="15" height="17.5" rx="2.2"/><rect x="4.5" y="4" width="15" height="17.5" rx="2.2"/><path d="M9 4V2.8h6V4"/><path d="m8 10.2 1.5 1.5 2.6-2.8"/><path d="M14 10.5h2.5"/><path d="m8 15.6 1.5 1.5 2.6-2.8"/><path d="M14 16h2.5"/></symbol>
+    <symbol id="u-strategy" viewBox="0 0 24 24"><path d="M5 18.5c4.5 0 3-6.2 7-6.2s3-6.3 7-6.3" stroke-dasharray="2.2 2.2"/><circle class="d" cx="5" cy="18.5" r="2.6"/><circle cx="5" cy="18.5" r="2.6"/><path d="M19 6V2.2"/><path class="f" d="M19 2.2l3.4 1.6L19 5.4z"/><circle class="f" cx="19" cy="6.2" r="1.3"/></symbol>
+    <symbol id="u-create" viewBox="0 0 24 24"><rect class="d" x="3" y="10" width="18" height="10.5" rx="1.8"/><rect x="3" y="10" width="18" height="10.5" rx="1.8"/><path d="M3 10 4.2 5.7 19.8 3.4 21 7.6"/><path d="m8.3 5.1 2 4.1M13.4 4.3l2 4.1"/><path d="M7 14.5h6M7 17h4"/></symbol>
+    <symbol id="u-launch" viewBox="0 0 24 24"><path class="d" d="M12 2.2c3.1 2.6 4.6 6.1 4.6 10.1l-2.1 4.1h-5l-2.1-4.1c0-4 1.5-7.5 4.6-10.1z"/><path d="M12 2.2c3.1 2.6 4.6 6.1 4.6 10.1l-2.1 4.1h-5l-2.1-4.1c0-4 1.5-7.5 4.6-10.1z"/><circle cx="12" cy="9" r="1.7"/><path d="M7.6 11.6 5 14.8l2.6 1.2M16.4 11.6l2.6 3.2-2.6 1.2"/><path class="f" d="M10.4 18.2h3.2L12 22z"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-6 6.5-6s5.9 2.4 6.5 6"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.2c2.6.2 4.4 2.3 5 5.3"/></symbol>
+    <!-- brand glyphs (monochrome) for the contact list -->
+    <symbol id="b-instagram" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M7.8 2.2h8.4a5.6 5.6 0 0 1 5.6 5.6v8.4a5.6 5.6 0 0 1-5.6 5.6H7.8a5.6 5.6 0 0 1-5.6-5.6V7.8a5.6 5.6 0 0 1 5.6-5.6Zm0 1.9a3.7 3.7 0 0 0-3.7 3.7v8.4a3.7 3.7 0 0 0 3.7 3.7h8.4a3.7 3.7 0 0 0 3.7-3.7V7.8a3.7 3.7 0 0 0-3.7-3.7H7.8Zm4.2 3a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Zm0 1.9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm5.2-3.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/></symbol>
+    <symbol id="b-gmail" viewBox="0 0 24 24"><path d="M2 7.1v11.2c0 .9.7 1.7 1.6 1.7h3.2v-8.6L12 15.3l5.2-3.9V20h3.2c.9 0 1.6-.8 1.6-1.7V7.1c0-2.1-2.4-3.3-4.1-2L12 9.2 6.1 5.1C4.4 3.8 2 5 2 7.1Z"/></symbol>
+    <symbol id="b-maps" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 1.8a7.4 7.4 0 0 0-7.4 7.4c0 5.4 6.2 12 7 12.8a.6.6 0 0 0 .8 0c.8-.8 7-7.4 7-12.8A7.4 7.4 0 0 0 12 1.8Zm0 4.6a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol>
+    <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5v5h4l5 4v-13l-5 4H4Z"/><path d="M16.5 9a4 4 0 0 1 0 6"/><path d="M19 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5v5h4l5 4v-13l-5 4H4Z"/><path d="m17 10 4 4M21 10l-4 4"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5-12-7.5Z"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ INTRO: LENS → LOGO ============ -->
+<div id="intro" class="intro" aria-label="UniCre8 intro">
+  <canvas class="intro__lens" id="introLens" aria-hidden="true"></canvas>
+  <div class="intro__logo" id="introLogo" aria-hidden="true">
+    <svg class="seglogo seglogo--intro" data-seglogo="intro" role="img" aria-label="UniCre8 UC8"></svg>
+    <div class="intro__scan"></div>
+  </div>
+  <div class="intro__ui">
+    <button class="intro__sound" id="introSound" type="button" aria-pressed="false">
+      <svg class="ico"><use href="#i-mute"/></svg><span>Sound</span>
+    </button>
+    <button class="intro__skip" id="introSkip" type="button">Skip intro <svg class="ico"><use href="#i-arrow"/></svg></button>
+  </div>
+</div>
+
+<!-- ============ GLOBAL BACKGROUND (moving line texture + dust + grain) ============ -->
+<canvas id="bg" class="bg-canvas" aria-hidden="true"></canvas>
+<div class="bg-vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ============ TOP SCROLL PROGRESS (replaces the side scrollbar) ============ -->
+<div class="scroll-progress" aria-hidden="true"><span id="scrollProgress"></span></div>
+
+<!-- ============ TOP NAV ============ -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__logo" href="#home" aria-label="UniCre8 home">
+      <svg class="seglogo seglogo--nav" data-seglogo="nav" aria-hidden="true"></svg>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#about">About</a>
+      <a href="team.html">Team</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="btn btn--accent btn--sm nav__cta" href="#contact">Start a project <svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+    <button class="nav__burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false"><svg class="ico"><use href="#i-menu"/></svg></button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <nav aria-label="Mobile">
+    <a href="#about"><span>01</span>About</a>
+    <a href="team.html"><span>02</span>Team</a>
+    <a href="#work"><span>03</span>Work</a>
+    <a href="#process"><span>04</span>Process</a>
+    <a href="#services"><span>05</span>Services</a>
+    <a href="#contact"><span>06</span>Contact</a>
+  </nav>
+  <a class="btn btn--accent" href="#contact">Start a project <svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+</div>
+
+<main id="top">
+
+  <!-- ============ 1. HERO ============ -->
+  <section class="hero section" id="home" data-section="home">
+    <canvas class="hero__circuit" id="heroCircuit" aria-hidden="true"></canvas>
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <h1 class="hero__title display">
+          <span class="line"><span data-hero>Digital</span></span>
+          <span class="line"><span data-hero>Marketing</span></span>
+          <span class="line"><span data-hero class="hero__accent">Solutions</span></span>
+        </h1>
+        <p class="hero__sub" data-hero>We visualise your dream into <em>reality.</em></p>
+        <div class="hero__ctas" data-hero>
+          <a class="btn btn--accent" href="#work">See our work <svg class="ico"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--ghost" href="#contact">Start a project <svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+        </div>
+      </div>
+      <div class="hero__visual" data-hero-visual>
+        <div class="hero-hub" id="heroHub" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- services ticker (fills the space between hero and about) -->
+  <div class="ticker" aria-label="Our services">
+    <div class="ticker__track">
+      <div class="ticker__group"><span class="ticker__item">Digital Marketing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Website Development</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Content Creation</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Personal Branding</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">SEO Optimization</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Editing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Designing Services</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Shooting</span><i class="ticker__star" aria-hidden="true">✦</i></div>
+      <div class="ticker__group" aria-hidden="true"><span class="ticker__item">Digital Marketing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Website Development</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Content Creation</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Personal Branding</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">SEO Optimization</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Editing</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item">Designing Services</span><i class="ticker__star" aria-hidden="true">✦</i><span class="ticker__item is-outline">Video Shooting</span><i class="ticker__star" aria-hidden="true">✦</i></div>
+    </div>
+  </div>
+
+  <!-- ============ 2. ABOUT / STATEMENT ============ -->
+  <section class="about section" id="about" data-section="about">
+    <div class="container">
+      <span class="eyebrow" data-reveal>About UC8</span>
+      <div class="about__grid">
+      <h2 class="statement display" data-split>
+        Let us be the reason your brand <em>stops</em> the scroll.
+      </h2>
+      <div class="about__body">
+        <p data-reveal><strong class="about__lead">Creative solutions, digital results.</strong> We don’t just market brands, we build their digital presence. From the first frame on camera to the last pixel on your website, UniCre8 handles it in one place, so your brand looks and sounds the same everywhere.</p>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. CLIENTS — hidden until real client logos are ready.
+       To bring it back: add logos to UC8_CLIENTS in js/data.js and un-comment this block.
+  <!-- ============ 3. CLIENTS / LOGO MARQUEE ============ —>
+  <section class="clients section section--tight" id="clients" data-section="about">
+    <div class="container clients__head" data-reveal>
+      <span class="eyebrow">Clients &amp; collaborations</span>
+    </div>
+    
+    <div class="marquee" data-reveal>
+      <div class="marquee__row" data-marquee="-0.55"><div class="marquee__track" id="marqueeA"></div></div>
+      <div class="marquee__row" data-marquee="0.45"><div class="marquee__track" id="marqueeB"></div></div>
+    </div>
+  </section>
+  ============ -->
+
+  <!-- ============ 5. WORK SHOWCASE (light table → grid) ============ -->
+  <section class="work section" id="work" data-section="work">
+    <div class="work__stage" id="workStage">
+      <div class="container work__head">
+        <div>
+          <span class="eyebrow">Selected work</span>
+          <h2 class="display h2 work__title">The <em>work</em> table</h2>
+          <p class="section-sub work__sub">Real brands, real numbers. A look at what we've built for the people who trust us.</p>
+        </div>
+        <div class="filters" role="tablist" aria-label="Filter projects">
+          <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="filter" data-filter="Websites" role="tab" aria-selected="false">Websites</button>
+          <button class="filter" data-filter="Social &amp; Content" role="tab" aria-selected="false">Social &amp; Content</button>
+          <button class="filter" data-filter="Branding" role="tab" aria-selected="false">Branding</button>
+          <button class="filter" data-filter="Video" role="tab" aria-selected="false">Video</button>
+          <button class="filter" data-filter="Campaigns" role="tab" aria-selected="false">Campaigns</button>
+        </div>
+      </div>
+      <div class="work__board" id="workBoard">
+        <!-- Projects — rendered from js/data.js (UC8_PROJECTS) -->
+        <div class="work__grid" id="workGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. PROCESS / PIPELINE ============ -->
+  <section class="process section" id="process" data-section="process">
+    <canvas class="process__stars" id="stars" aria-hidden="true"></canvas>
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow" data-reveal>How a project runs</span>
+        <h2 class="display h2" data-split>From dream to <em>reality</em></h2>
+        <p class="section-sub" data-reveal>Four stages, one team. You always know what is being made and what comes next.</p>
+      </div>
+      <div class="pipeline" id="pipeline">
+        <div class="pipeline__line"><span id="pipelineFill"></span></div>
+        <article class="glass step" data-step>
+          <div class="step__top"><span class="step__num display">01</span><span class="badge"><svg class="ico"><use href="#u-brief"/></svg></span></div>
+          <h3 class="step__title">Brief</h3>
+          <p>We learn your brand, your audience and what you want people to do after they see it.</p>
+          <ul class="step__inside"><li>Discovery call</li><li>Goals &amp; KPIs</li><li>Audit of your current presence</li></ul>
+          <button class="step__more" type="button" aria-expanded="false" aria-label="See what's inside"><svg class="ico"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="glass step" data-step>
+          <div class="step__top"><span class="step__num display">02</span><span class="badge"><svg class="ico"><use href="#u-strategy"/></svg></span></div>
+          <h3 class="step__title">Strategy</h3>
+          <p>A plan for content, channels and keywords that fits your goals and budget.</p>
+          <ul class="step__inside"><li>Content pillars &amp; calendar</li><li>Channel &amp; budget plan</li><li>Moodboards &amp; creative direction</li></ul>
+          <button class="step__more" type="button" aria-expanded="false" aria-label="See what's inside"><svg class="ico"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="glass step" data-step>
+          <div class="step__top"><span class="step__num display">03</span><span class="badge"><svg class="ico"><use href="#u-create"/></svg></span></div>
+          <h3 class="step__title">Create</h3>
+          <p>We shoot, edit, write and design the pieces, and build the site that holds them together.</p>
+          <ul class="step__inside"><li>Shoots &amp; production</li><li>Design &amp; development</li><li>Structured review rounds</li></ul>
+          <button class="step__more" type="button" aria-expanded="false" aria-label="See what's inside"><svg class="ico"><use href="#i-arrow"/></svg></button>
+        </article>
+        <article class="glass step" data-step>
+          <div class="step__top"><span class="step__num display">04</span><span class="badge"><svg class="ico"><use href="#u-launch"/></svg></span></div>
+          <h3 class="step__title">Launch</h3>
+          <p>Everything goes live, optimised for search, ready to bring in your first real results.</p>
+          <ul class="step__inside"><li>Go-live &amp; distribution</li><li>Analytics &amp; reporting</li><li>Monthly optimisation</li></ul>
+          <button class="step__more" type="button" aria-expanded="false" aria-label="See what's inside"><svg class="ico"><use href="#i-arrow"/></svg></button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7. SERVICES ============ -->
+  <section class="services section" id="services" data-section="services">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div>
+          <span class="eyebrow" data-reveal>What we do</span>
+          <h2 class="display h2" data-split>Services, <em>end&nbsp;to&nbsp;end</em></h2>
+        </div>
+        <p class="section-sub" data-reveal>Eight disciplines under one roof — mix and match, or hand us the whole thing.</p>
+      </div>
+      <div class="services__grid" id="servicesGrid" data-stagger></div>
+    </div>
+  </section>
+
+  <!-- ============ 8. CONTACT ============ -->
+  <section class="contact section" id="contact" data-section="contact">
+    <div class="container">
+      <div class="contact__grid">
+        <div class="contact__info">
+          <span class="eyebrow" data-reveal>Contact us</span>
+          <h2 class="display contact__title" data-split>Let's create something <em>unforgettable.</em></h2>
+          <p class="section-sub" data-reveal>Send a message on Instagram or write to us by email. Tell us what you are building and we will take it from there.</p>
+          <ul class="contact__list" data-stagger>
+            <li><a href="https://www.instagram.com/uni_create8/" target="_blank" rel="noopener"><span class="badge badge--sm badge--brand"><svg class="ico ico--solid"><use href="#b-instagram"/></svg></span><span><small class="mono">Instagram</small>@uni_create8</span></a></li>
+            <li class="contact__mail">
+              <a href="mailto:unicreate9999@gmail.com"><span class="badge badge--sm badge--brand"><svg class="ico ico--solid"><use href="#b-gmail"/></svg></span><span><small class="mono">Email</small>unicreate9999@gmail.com</span></a>            </li>
+            <li><a href="https://maps.app.goo.gl/vSu5hzFeM7i9BTVx9?g_st=aw" target="_blank" rel="noopener"><span class="badge badge--sm badge--brand"><svg class="ico ico--solid"><use href="#b-maps"/></svg></span><span><small class="mono">Find us</small>Open in Google Maps</span></a></li>
+          </ul>
+          <div class="map glass" data-reveal>
+            <iframe title="UniCre8 location on Google Maps" src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3974.1956858070835!2d78.35175199999999!3d17.473418!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTfCsDI4JzI0LjMiTiA3OMKwMjEnMDYuMyJF!5e1!3m2!1sen!2sin!4v1792303429878!5m2!1sen!2sin" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            <a class="map__open mono" href="https://maps.app.goo.gl/vSu5hzFeM7i9BTVx9?g_st=aw" target="_blank" rel="noopener">Open in Maps <svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+          </div>
+        </div>
+
+        <!-- Form: until FORM_ENDPOINT is set in js/main.js, submitting opens the visitor's email app addressed to unicreate9999@gmail.com. -->
+        <form class="glass form" id="contactForm" novalidate data-reveal>
+          <div class="form__row">
+            <label class="field"><span>Name *</span><input name="name" type="text" autocomplete="name" required placeholder="Your full name" /><em class="field__err"></em></label>
+            <label class="field"><span>Email *</span><input name="email" type="email" autocomplete="email" required placeholder="you@brand.com" /><em class="field__err"></em></label>
+          </div>
+          <div class="form__row">
+            <label class="field"><span>Phone</span><input name="phone" type="tel" autocomplete="tel" placeholder="+91 …" /><em class="field__err"></em></label>
+            <label class="field"><span>Company / Brand</span><input name="company" type="text" autocomplete="organization" placeholder="Brand name" /><em class="field__err"></em></label>
+          </div>
+          <div class="form__row">
+            <label class="field field--select"><span>Project type *</span>
+              <select name="type" required>
+                <option value="" selected disabled>Select a service</option>
+                <option>Digital Marketing</option>
+                <option>Website Development</option>
+                <option>Content Creation</option>
+                <option>Personal Branding</option>
+                <option>SEO Optimization</option>
+                <option>Video Editing</option>
+                <option>Designing Services</option>
+                <option>Video Shooting</option>
+                <option>Not sure yet — let's talk</option>
+              </select><em class="field__err"></em>
+            </label>
+            <label class="field field--select"><span>Timeline</span>
+              <select name="timeline">
+                <option value="" selected disabled>When do you need it?</option>
+                <option>ASAP (under 2 weeks)</option>
+                <option>2–4 weeks</option>
+                <option>1–3 months</option>
+                <option>3+ months</option>
+                <option>Flexible</option>
+              </select><em class="field__err"></em>
+            </label>
+          </div>
+          <label class="field"><span>Message * <b class="counter mono" id="msgCount">0 / 600</b></span>
+            <textarea name="message" rows="5" maxlength="600" required placeholder="Goals, references, budget range — anything that helps."></textarea><em class="field__err"></em>
+          </label>
+          <button class="btn btn--accent btn--block" type="submit"><span class="btn__label">Send project brief</span> <svg class="ico"><use href="#i-arrow"/></svg></button>
+          <p class="form__status mono" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <svg class="seglogo seglogo--footer" data-seglogo="footer" aria-hidden="true"></svg>
+    <p class="footer__copy">© <span id="year">2026</span> UniCre8. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Modal (services / projects detail) -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__panel glass">
+    <button class="modal__close" type="button" data-close aria-label="Close"><svg class="ico"><use href="#i-close"/></svg></button>
+    <span class="mono modal__kicker" id="modalKicker"></span>
+    <h3 class="display modal__title" id="modalTitle"></h3>
+    <p class="modal__text" id="modalText"></p>
+    <ul class="modal__list" id="modalList"></ul>
+    <div class="modal__actions">
+      <a class="btn btn--accent" href="#contact" data-close>Start a project <svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+      <a class="btn btn--ghost" id="modalExtra" href="#" target="_blank" rel="noopener" hidden><svg class="ico"><use href="#i-instagram"/></svg><span>Instagram</span><svg class="ico"><use href="#i-arrow-ur"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="js/segments.js?v=1.1.1"></script>
+<script src="js/lens.js?v=1.1.1"></script>
+<script src="js/hero-hub.js?v=1.1.1"></script>
+<script src="js/background.js?v=1.1.1"></script>
+<script src="js/intro.js?v=1.1.1"></script>
+<script src="js/data.js?v=1.1.1"></script>
+<script src="js/main.js?v=1.1.1"></script>
+</body>
+</html>
