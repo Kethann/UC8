@@ -63,15 +63,23 @@
     const segs = [];
     if (label) {
       const t = document.createElementNS(NS, 'text');
-      t.setAttribute('x', 2);
       t.setAttribute('y', -20);
-      t.setAttribute('textLength', totalW - 4);         // justified across the full mark, like the brand file
-      t.setAttribute('lengthAdjust', 'spacing');
+      t.setAttribute('text-anchor', 'middle');
       t.setAttribute('class', 'seglogo__label');
-      // one <tspan> per letter so the intro can fade them in one by one (textLength still justifies the whole word)
-      'UniCre8'.split('').forEach((ch) => {
+      // Justified across the full mark, like the brand file. Each letter gets its own fixed x position
+      // (centred on it) instead of using textLength: Chrome does not re-apply textLength after the web
+      // font loads, which collapsed the word to the left. Fixed positions can't drift in any browser.
+      const word = 'UniCre8'.split('');
+      const cw = 14;                                   // approx. letter width at this size
+      const x0 = 2 + cw / 2, x1 = totalW - 2 - cw / 2;
+      word.forEach((ch, i) => {
         const s = document.createElementNS(NS, 'tspan');
         s.setAttribute('class', 'seglogo__char');
+        const last = word.length - 1;
+        // first letter's left edge and last letter's right edge sit exactly on the mark's edges
+        if (i === 0) { s.setAttribute('x', 0); s.setAttribute('text-anchor', 'start'); }
+        else if (i === last) { s.setAttribute('x', totalW); s.setAttribute('text-anchor', 'end'); }
+        else s.setAttribute('x', (x0 + (i * (x1 - x0)) / last).toFixed(1));
         s.textContent = ch;
         t.appendChild(s);
       });

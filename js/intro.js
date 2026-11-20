@@ -112,7 +112,7 @@
     gsap.set(label, { opacity: 0.9 });
     gsap.set(chars, { attr: { 'fill-opacity': 0 } });
     tl.fromTo(label, { y: 14, filter: 'blur(6px)' }, { y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out' }, 0.08);
-    tl.to(chars, { attr: { 'fill-opacity': 1 }, duration: 0.42, ease: 'power2.out', stagger: 0.07 }, 0.1);
+    tl.to(chars, { attr: { 'fill-opacity': 1 }, duration: 0.42, ease: 'power2.out', stagger: { each: 0.09, from: 'center' } }, 0.1); // centre-out: the word looks balanced at every moment
     tl.call(() => gsap.set(label, { clearProps: 'filter' }), null, 1.0); // hand back to the CSS glow
     /* ---- "starting trouble": the display struggles to power on, then snaps fully on ---- */
     const R = (min, max) => min + Math.random() * (max - min);
