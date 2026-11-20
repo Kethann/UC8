@@ -1594,3 +1594,40 @@ a, button, .work-card, .filter, .case__ig { -webkit-tap-highlight-color: transpa
 @media (max-width: 640px) {
   .case .case__actions { display: flex; justify-content: center; width: 100%; }
 }
+
+/* ==========================================================================
+   Process: each step has its own colour on hover + a small icon motion
+   ========================================================================== */
+.pipeline .step:nth-of-type(1) { --sc: #6cc4f5; --sc-a: rgba(108, 196, 245, 0.45); }
+.pipeline .step:nth-of-type(2) { --sc: #a78bfa; --sc-a: rgba(167, 139, 250, 0.45); }
+.pipeline .step:nth-of-type(3) { --sc: #f48fc0; --sc-a: rgba(244, 143, 192, 0.45); }
+.pipeline .step:nth-of-type(4) { --sc: #62d6ab; --sc-a: rgba(98, 214, 171, 0.45); }
+.step { transition: border-color 0.4s var(--ease), box-shadow 0.4s var(--ease); }
+.step:hover, .step:focus-within { border-color: var(--sc-a, rgba(255, 122, 26, 0.45)); box-shadow: 0 24px 50px -30px var(--sc-a, rgba(255, 122, 26, 0.45)); }
+.step:hover .step__num, .step:focus-within .step__num { color: var(--sc, var(--accent)); -webkit-text-stroke-color: var(--sc, var(--accent)); }
+.step:hover .badge, .step:focus-within .badge { color: var(--sc, #fff); border-color: var(--sc-a, rgba(255, 255, 255, 0.32)); }
+.step:hover .step__more, .step:focus-within .step__more, .step__more:hover { background: var(--sc, var(--accent)); border-color: var(--sc, var(--accent)); color: #0b0b0b; }
+.step .step__inside li::before { background: var(--sc, var(--accent)); }
+.step .badge .ico { transition: color 0.3s; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pipeline .step:nth-of-type(1):hover .badge .ico { animation: icoTick 0.7s var(--ease); }
+  .pipeline .step:nth-of-type(2):hover .badge .ico { animation: icoPath 0.8s var(--ease); }
+  .pipeline .step:nth-of-type(3):hover .badge .ico { animation: icoClap 0.6s var(--ease); }
+  .pipeline .step:nth-of-type(4):hover .badge .ico { animation: icoLift 0.9s var(--ease); }
+}
+@keyframes icoTick { 0%, 100% { transform: none; } 35% { transform: rotate(-8deg) scale(1.08); } 65% { transform: rotate(5deg); } }
+@keyframes icoPath { 0%, 100% { transform: none; } 50% { transform: translate(2px, -2px); } }
+@keyframes icoClap { 0%, 100% { transform: none; } 30% { transform: scale(1.12) rotate(-4deg); } 60% { transform: scale(0.96); } }
+@keyframes icoLift { 0% { transform: none; } 45% { transform: translateY(-5px); } 60% { transform: translateY(-5px); } 100% { transform: none; } }
+
+/* Radee Sarees: growth pillars rising behind the numbers */
+.mo-bars rect { transform-box: fill-box; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .case:not(.is-live) .mo-bars rect { transform: scaleY(0); }
+  .is-live .mo-bars rect { animation: moGrow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(0.25s + var(--i) * 0.11s); }
+}
+@keyframes moGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+/* "About UC8": the real seven-segment UC8 mark in brand blue */
+.seglogo--inline { height: 1.05em; width: auto; vertical-align: -0.16em; margin-left: 0.45em; overflow: visible; filter: drop-shadow(0 0 5px rgba(47, 123, 255, 0.55)); }
+.seglogo--inline .seg { fill: var(--blue); }

@@ -205,12 +205,14 @@
         <pattern id="${u}z" width="24" height="34" patternUnits="userSpaceOnUse" y="160">
           <path d="M12 6 20 17 12 28 4 17Z" fill="url(#${u}g)"/><path d="M12 11 16 17 12 23 8 17Z" fill="#5c0e22"/><circle cx="12" cy="17" r="1.6" fill="url(#${u}g)"/>
           <circle cx="0" cy="17" r="1.8" fill="url(#${u}g)"/><circle cx="24" cy="17" r="1.8" fill="url(#${u}g)"/></pattern>
+        <linearGradient id="${u}bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd1dc" stop-opacity=".55"/><stop offset="1" stop-color="#ffd1dc" stop-opacity=".04"/></linearGradient>
         <clipPath id="${u}cb"><rect y="152" width="300" height="48"/></clipPath></defs>
         <g class="mo-drape">
           <path d="M0 70C60 46 112 96 176 72S262 40 300 58V200H0Z" fill="url(#${u}s)"/>
           <path d="M0 108C50 92 104 128 160 112S250 82 300 96V200H0Z" fill="#000" opacity=".18"/>
           <path d="M30 200C60 150 92 106 150 80l18 2c-58 26-86 68-110 118Z" fill="url(#${u}h)"/>
           <path d="M150 200c26-48 60-86 120-112l14 4c-56 24-90 62-112 108Z" fill="url(#${u}h)" opacity=".7"/>
+          <g class="mo-bars">${[22, 34, 48, 66, 88, 114].map((h, i) => `<rect style="--i:${i}" x="${92 + i * 34}" y="${152 - h}" width="20" height="${h}" rx="4" fill="url(#${u}bar)"/>`).join('')}</g>
           <rect y="152" width="300" height="48" fill="#3e0917"/>
           <rect y="154" width="300" height="3" fill="url(#${u}g)"/><rect y="194" width="300" height="3" fill="url(#${u}g)"/>
           <rect y="160" width="300" height="34" fill="url(#${u}z)"/>
@@ -422,7 +424,17 @@
     if (!('IntersectionObserver' in window)) { cards.forEach((c) => c.classList.add('is-live')); return; }
     const io = new IntersectionObserver((ents) => ents.forEach((en) => {
       // On the home page the stack animation marks each card live as it lands (grid.dataset.deal)
-      if (en.isIntersecting) { io.unobserve(en.target); if (grid.dataset.deal !== '1') en.target.classList.add('is-live'); }
+      const c = en.target;
+      clearTimeout(c._liveT);
+      if (!en.isIntersecting) return;
+      if (grid.dataset.deal !== '1') { io.unobserve(c); c.classList.add('is-live'); return; }
+      // Safety net on the home page: if a card has been in view for a moment, play it even if the stack animation hasn't marked it yet
+      // (only once the card is actually in its place, not while it is still in the pile).
+      const check = () => {
+        const g = window.gsap, off = g ? Math.abs(g.getProperty(c, 'rotation')) + (Math.abs(g.getProperty(c, 'x')) + Math.abs(g.getProperty(c, 'y'))) / 40 : 0;
+        if (off < 0.6) { c.classList.add('is-live'); io.unobserve(c); } else c._liveT = setTimeout(check, 500);
+      };
+      c._liveT = setTimeout(check, 700);
     }), { threshold: 0.35 });
     cards.forEach((c) => io.observe(c));
   })();
@@ -787,18 +799,21 @@
       };
       list.forEach((el, i) => gsap.set(el, { zIndex: n - i }));
       const tl = gsap.timeline({ scrollTrigger: {
-        trigger: board, start: () => `top ${navH() + 8}px`, end: () => `+=${Math.round(window.innerHeight * (0.45 + n * 0.42))}`,
-        scrub: 0.6, pin: true, anticipatePin: 1, invalidateOnRefresh: true,
+        trigger: board, start: () => `top ${navH() + 8}px`, end: () => `+=${Math.round(window.innerHeight * (0.2 + n * 0.16))}`,
+        scrub: 0.4, pin: true, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: (self) => stage.classList.toggle('is-resolved', self.progress > 0.92),
         onLeave: () => { stage.classList.add('is-resolved'); list.forEach(land); },
       } });
       tl.fromTo(grid, { rotateX: 22, scale: 0.9 }, { rotateX: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0);
+      const at = (i) => 0.3 + i * 0.55;
       list.forEach((el, i) => {
         tl.fromTo(el,
           { x: () => pile(el).x, y: () => pile(el).y, rotation: tilt[i % tilt.length], scale: 0.9 },
-          { x: 0, y: 0, rotation: 0, scale: 1, duration: 1, ease: 'power3.inOut', immediateRender: true, onComplete: () => land(el) },
-          0.35 + i * 0.85);
+          { x: 0, y: 0, rotation: 0, scale: 1, duration: 1, ease: 'power3.inOut', immediateRender: true },
+          at(i));
       });
+      // A card counts as landed once it is 80% of the way to its place (scrub smoothing never quite reaches 100%)
+      tl.eventCallback('onUpdate', () => { const t = tl.time(); list.forEach((el, i) => { if (t >= at(i) + 0.75) land(el); }); });
       tl.to({}, { duration: 0.25 }); // short hold on the finished table
       return () => { stage.classList.remove('is-resolved'); delete grid.dataset.deal; gsap.set(list, { clearProps: 'zIndex' }); };
     }
@@ -811,8 +826,8 @@
       gsap.fromTo(el,
         { y: 70, rotation: tilt[i % tilt.length] * 0.8, scale: 0.92, opacity: 0.4 },
         { y: 0, rotation: 0, scale: 1, opacity: 1, ease: 'power2.out', immediateRender: true,
-          scrollTrigger: { trigger: el, start: 'top 98%', end: 'top 62%', scrub: 0.5, invalidateOnRefresh: true, onLeave: () => land(el) },
-          onComplete: () => land(el) });
+          scrollTrigger: { trigger: el, start: 'top 98%', end: 'top 62%', scrub: 0.5, invalidateOnRefresh: true,
+            onUpdate: (self) => { if (self.progress > 0.7) land(el); }, onLeave: () => land(el) } });
     });
     return () => { stage.classList.remove('is-resolved'); delete grid.dataset.deal; };
   });

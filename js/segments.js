@@ -69,7 +69,7 @@
       // Justified across the full mark, like the brand file. Each letter gets its own fixed x position
       // (centred on it) instead of using textLength: Chrome does not re-apply textLength after the web
       // font loads, which collapsed the word to the left. Fixed positions can't drift in any browser.
-      const word = 'UniCre8'.split('');
+      const word = 'UNICRE8'.split('');
       const cw = 14;                                   // approx. letter width at this size
       const x0 = 2 + cw / 2, x1 = totalW - 2 - cw / 2;
       word.forEach((ch, i) => {
@@ -107,4 +107,5 @@
   // Nav and footer logos
   document.querySelectorAll('[data-seglogo="nav"]').forEach((svg) => build(svg, { label: false }));
   document.querySelectorAll('[data-seglogo="footer"]').forEach((svg) => build(svg, { label: false }));
+  document.querySelectorAll('[data-seglogo="inline"]').forEach((svg) => build(svg, { label: false }));
 })();

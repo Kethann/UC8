@@ -422,15 +422,16 @@
       chars.forEach((ch, j) => { ctx.fillText(ch, cx2, y + r * 0.45 + oy * 0.5); cx2 += ws[j] + sp; });
     }
     ctx.restore();
-    // reach counter: races 0 → 2.5M in ~1.4s (fast, ease-out), holds "2.5M+", replays every full cycle
+    // reach counter: 0 → 2.5M and 0 → 30 days together in 1.2s (fast, ease-out), holds "2.5M+" for 2s, then replays
     if (reachStart < 0 && !document.documentElement.classList.contains('intro-active')) reachStart = t;
     {
-      const cyc = STAGE_T * STAGES.length, lt = reachStart < 0 ? 0 : (t - reachStart) % cyc;
-      const k = Math.min(1, lt / 1.4), e = k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
+      const RUN = 1.2, HOLD = 2, lt = reachStart < 0 ? 0 : (t - reachStart) % (RUN + HOLD);
+      const k = Math.min(1, lt / RUN), e = k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
       const num = k >= 1 ? '2.5M+' : Math.round(2500000 * e).toLocaleString('en-US');
-      const ny = y + r * 0.62, fs = Math.max(15, r * 0.19);
+      const days = k >= 1 ? 30 : Math.max(1, Math.round(30 * e));
+      const ny = y + r * 0.6, fs = Math.max(13, r * 0.155);
       text(num, x, ny, fs, k >= 1 ? '#ffffff' : 'rgba(255,255,255,0.86)', 400, 'center', '"Anton", Impact, "Arial Narrow", sans-serif');
-      text('REACH IN 30 DAYS', x, ny + fs * 0.82, Math.max(8.5, r * 0.072), 'rgba(255,122,26,0.95)', 600, 'center', '"JetBrains Mono", monospace');
+      text(`REACH IN ${days} DAYS`, x, ny + fs * 0.86, Math.max(8, r * 0.066), 'rgba(255,122,26,0.95)', 600, 'center', '"JetBrains Mono", monospace');
     }
 
     // glass on top: fresnel rim, window reflection, glints
