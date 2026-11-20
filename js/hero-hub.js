@@ -505,6 +505,7 @@
      ========================================================================== */
   let raf = 0, visible = true, tPrev = performance.now(), t0 = tPrev;
   function frame(now) {
+    if (document.documentElement.classList.contains('intro-active')) { tPrev = now; raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; } // hidden under the intro
     const dt = Math.max(0, Math.min(0.05, (now - tPrev) / 1000)); tPrev = now;
     const t = Math.max(0, (now - t0) / 1000);
     measure();

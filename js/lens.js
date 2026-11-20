@@ -75,12 +75,12 @@
     resize() {
       const c = this.c, r = c.getBoundingClientRect();
       this.w = Math.max(1, r.width); this.h = Math.max(1, r.height);
-      this.dpr = Math.min(window.devicePixelRatio || 1, this.o.mode === 'hero' ? 2 : 1.75);
+      this.dpr = Math.min(window.devicePixelRatio || 1, this.o.mode === 'hero' ? 2 : (this.w < 768 ? 1 : 1.25));
       c.width = Math.round(this.w * this.dpr); c.height = Math.round(this.h * this.dpr);
       this.R = this.o.mode === 'intro'
         ? Math.max(Math.min(this.w, this.h) / 2 * 1.55, Math.max(this.w, this.h) / 2 * 0.92)
         : Math.min(this.w, this.h) / 2 * 0.985;
-      const pxPerR = Math.min(this.R * this.dpr * 1.12, this.o.mode === 'intro' ? 1150 : 900);
+      const pxPerR = Math.min(this.R * this.dpr, this.o.mode === 'intro' ? (this.w < 768 ? 520 : 720) : 900);
       if (Math.abs((this._ppr || 0) - pxPerR) > 4) { this._ppr = pxPerR; this._build(pxPerR); }
     }
 
@@ -309,9 +309,8 @@
         g.addColorStop(0.3, `rgb(${13 + sheen * 9 | 0},${13 + sheen * 9 | 0},${15 + sheen * 10 | 0})`);
         g.addColorStop(1, '#050506');
         x.fillStyle = g;
-        x.shadowColor = 'rgba(0,0,0,.75)'; x.shadowBlur = Math.max(4, Z * 0.012);
         x.fill();
-        x.shadowBlur = 0;
+        x.strokeStyle = 'rgba(0,0,0,.6)'; x.lineWidth = Math.max(1.5, Z * 0.004); x.stroke(); // cheap edge shadow
         // knife edge highlight
         const el = 2 * s + Z * 0.01;
         x.beginPath(); x.moveTo(V[0], V[1]); x.lineTo(V[0] + d[0] * el, V[1] + d[1] * el);
@@ -386,7 +385,8 @@
         const ph = s.sweep, r = 0.5 * Z;
         const warm = intro ? [255, 196, 140] : A;
         x.lineCap = 'round';
-        x.shadowColor = `rgba(${warm[0]},${warm[1]},${warm[2]},.9)`; x.shadowBlur = Z * 0.03;
+        x.strokeStyle = `rgba(${warm[0]},${warm[1]},${warm[2]},${s.sweepA * 0.08})`; x.lineWidth = Z * 0.05;
+        x.beginPath(); x.arc(0, 0, r - Z * 0.01, ph - 0.24, ph + 0.24); x.stroke(); // soft glow
         for (let k = 0; k < 3; k++) {
           x.strokeStyle = `rgba(${warm[0]},${warm[1]},${warm[2]},${s.sweepA * (0.5 - k * 0.14)})`;
           x.lineWidth = Z * (0.006 + k * 0.01);
@@ -437,10 +437,12 @@
         const vg = x.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.hypot(w, h) * 0.55);
         vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.75)');
         x.fillStyle = vg; x.fillRect(0, 0, w, h);
-        x.save(); x.globalAlpha = 0.07; x.globalCompositeOperation = 'overlay';
-        const p = x.createPattern(this.noise, 'repeat');
-        x.translate(Math.random() * 160, Math.random() * 160);
-        x.fillStyle = p; x.fillRect(-160, -160, w + 320, h + 320);
+        this._gf = (this._gf || 0) + 1;
+        if (!this._pat) this._pat = x.createPattern(this.noise, 'repeat');
+        if (this._gf % 2 === 0) { this._go = [Math.random() * 160, Math.random() * 160]; }
+        const go = this._go || [0, 0];
+        x.save(); x.globalAlpha = 0.035; x.translate(go[0], go[1]);
+        x.fillStyle = this._pat; x.fillRect(-160, -160, w + 320, h + 320);
         x.restore();
       }
 

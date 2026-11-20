@@ -1,6 +1,6 @@
 /* ==========================================================================
    INTRO — "Lens to Logo" (≈6s). Plays on every load/refresh and when the
-   nav UC8 logo is clicked. Skippable (click / Esc / Enter / Space).
+   nav UC8 logo is clicked. Tap / Esc / Enter / Space ends it early.
    ========================================================================== */
 (function () {
   const html = document.documentElement;
@@ -15,6 +15,11 @@
   }
 
   if (!root) { window.UC8_INTRO_DONE = true; return; }
+  // If a required library failed to load, skip straight to the site instead of hanging on black.
+  if (typeof window.gsap === 'undefined' || !window.LensRenderer || !window.UC8Seg) {
+    if (html.classList.contains('intro-active')) finish(); else window.UC8_INTRO_DONE = true;
+    return;
+  }
   const autoplay = html.classList.contains('intro-active');
   if (!autoplay) window.UC8_INTRO_DONE = true;
 
@@ -27,67 +32,6 @@
   const label = svg.querySelector('.seglogo__label');
   const scan = logoWrap.querySelector('.intro__scan');
   let lens = null; // built lazily (heavy) on first play
-
-  /* ---------------- Sound design (WebAudio, opt-in) ---------------- */
-  let actx = null, soundOn = false;
-  const soundBtn = document.getElementById('introSound');
-  function noiseBuf(dur) {
-    const b = actx.createBuffer(1, actx.sampleRate * dur, actx.sampleRate), d = b.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    return b;
-  }
-  const SFX = {
-    click() {
-      const t = actx.currentTime, s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
-      s.buffer = noiseBuf(0.08); f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = 4;
-      g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-      s.connect(f).connect(g).connect(actx.destination); s.start(t);
-    },
-    whirr(dur) {
-      const t = actx.currentTime, s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
-      const o = actx.createOscillator(), og = actx.createGain();
-      s.buffer = noiseBuf(dur); f.type = 'bandpass'; f.Q.value = 9;
-      f.frequency.setValueAtTime(700, t); f.frequency.linearRampToValueAtTime(2400, t + dur);
-      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.14, t + 0.08); g.gain.linearRampToValueAtTime(0.0001, t + dur);
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(90, t); o.frequency.linearRampToValueAtTime(160, t + dur);
-      og.gain.setValueAtTime(0.0001, t); og.gain.linearRampToValueAtTime(0.025, t + 0.1); og.gain.linearRampToValueAtTime(0.0001, t + dur);
-      s.connect(f).connect(g).connect(actx.destination); o.connect(og).connect(actx.destination);
-      s.start(t); o.start(t); o.stop(t + dur);
-    },
-    whoosh() {
-      const t = actx.currentTime, s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
-      s.buffer = noiseBuf(0.7); f.type = 'lowpass';
-      f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(6000, t + 0.25); f.frequency.exponentialRampToValueAtTime(400, t + 0.65);
-      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.3, t + 0.2); g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
-      s.connect(f).connect(g).connect(actx.destination); s.start(t);
-    },
-    buzz(dur) {
-      const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain(), lfo = actx.createOscillator(), lg = actx.createGain();
-      o.type = 'sawtooth'; o.frequency.value = 100;
-      lfo.type = 'square'; lfo.frequency.value = 13; lg.gain.value = 0.02;
-      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.03, t + 0.05); g.gain.setValueAtTime(0.03, t + dur - 0.1); g.gain.linearRampToValueAtTime(0.0001, t + dur);
-      lfo.connect(lg).connect(g.gain); o.connect(g).connect(actx.destination);
-      o.start(t); lfo.start(t); o.stop(t + dur); lfo.stop(t + dur);
-    },
-    tick() {
-      const t = actx.currentTime;
-      [1760, 2640].forEach((fr, i) => {
-        const o = actx.createOscillator(), g = actx.createGain();
-        o.type = 'sine'; o.frequency.value = fr;
-        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(i ? 0.05 : 0.12, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
-        o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 0.4);
-      });
-    },
-  };
-  function sfx(name, arg) { if (soundOn && actx) { try { SFX[name](arg); } catch (e) {} } }
-  soundBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    soundOn = !soundOn;
-    if (soundOn && !actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { soundOn = false; } }
-    if (actx && actx.state === 'suspended') actx.resume();
-    soundBtn.setAttribute('aria-pressed', String(soundOn));
-    soundBtn.querySelector('use').setAttribute('href', soundOn ? '#i-sound' : '#i-mute');
-  });
 
   /* ---------------- Easing / timing helpers ---------------- */
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -115,6 +59,9 @@
   let start = 0, raf = 0, lensDone = false, killed = false;
 
   function frame(now) {
+    try { renderFrame(now); } catch (err) { killed = true; cancelAnimationFrame(raf); handed = false; handoff(); }
+  }
+  function renderFrame(now) {
     if (!start) start = now;
     const t = (now - start) / 1000 / SCALE;
 
@@ -147,9 +94,6 @@
     }
     lens.render(state);
 
-    once('click', t, T_IRIS0, () => { sfx('click'); sfx('whirr', 1.35 * SCALE); });
-    once('click2', t, T_IRIS1 - 0.05, () => sfx('click'));
-    once('whoosh', t, 2.95, () => sfx('whoosh'));
     once('logo', t, T_FLASH1, playLogo);
 
     if (t < T_BLACK + 0.05 && !killed) raf = requestAnimationFrame(frame);
@@ -176,7 +120,6 @@
     const catchers = shuffled.slice(0, 6);          // these half-catch and hang dimly ("part on")
     const blippers = shuffled.slice(6);             // these only blip faintly
     const T0 = 0.78;                                 // label has faded in by now
-    tl.call(() => sfx('buzz', 1.0 * SCALE), null, T0);
     catchers.forEach((sg, i) => {
       let t = T0 + i * R(0.04, 0.09);
       const n = 3 + Math.floor(Math.random() * 3);
@@ -200,7 +143,7 @@
     });
     // SURGE: the whole mark snaps fully on together with a bloom overshoot
     const ON = BO + 0.36;
-    tl.call(() => { segs.forEach((sg) => sg.classList.add('is-lit')); svg.classList.remove('is-surge'); void svg.getBBox(); svg.classList.add('is-surge'); sfx('tick'); }, null, ON);
+    tl.call(() => { segs.forEach((sg) => sg.classList.add('is-lit')); svg.classList.remove('is-surge'); void svg.getBBox(); svg.classList.add('is-surge'); }, null, ON);
     tl.to(segs, { opacity: 1, duration: 0.05 }, ON);
     const lastOne = shuffled[shuffled.length - 1];  // one stubborn segment settles a beat late
     tl.to(lastOne, { opacity: 0.35, duration: 0.03 }, ON + 0.16).to(lastOne, { opacity: 1, duration: 0.05 }, ON + 0.21);
@@ -264,7 +207,6 @@
     handoff();
   }
   root.addEventListener('click', skip);
-  document.getElementById('introSkip').addEventListener('click', (e) => { e.stopPropagation(); skip(); });
   window.addEventListener('keydown', (e) => {
     if (running && !handed && ['Escape', 'Enter', ' '].includes(e.key)) { e.preventDefault(); skip(); }
   });
@@ -273,8 +215,10 @@
   let started = false;
   const go = () => {
     if (started) return; started = true;
-    if (!lens) lens = new LensRenderer(canvas, { mode: 'intro', haze: [118, 104, 255] });
-    else lens.resize();
+    try {
+      if (!lens) lens = new LensRenderer(canvas, { mode: 'intro', haze: [118, 104, 255] });
+      else lens.resize();
+    } catch (err) { handed = false; handoff(); return; }
     raf = requestAnimationFrame(frame);
   };
   function resetState() {

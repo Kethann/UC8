@@ -33,7 +33,7 @@
      ------------------------------------------------------------------ */
   let lenis = null;
   if (window.Lenis && !reduce) {
-    lenis = new Lenis({ lerp: 0.095, smoothWheel: true, wheelMultiplier: 0.95 });
+    lenis = new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 1 });
     if (hasGSAP) {
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -488,9 +488,32 @@
   })();
 
   /* ------------------------------------------------------------------
-     Without GSAP: show everything and stop here
+     Phone: tap the number to choose Call or WhatsApp
      ------------------------------------------------------------------ */
-  if (!hasGSAP) return;
+  (() => {
+    const wrap = $('#contactPhone');
+    if (!wrap) return;
+    const btn = $('.contact__phone-btn', wrap), opts = $('#phoneOptions');
+    const setOpen = (open) => { opts.hidden = !open; btn.setAttribute('aria-expanded', String(open)); };
+    btn.addEventListener('click', () => setOpen(opts.hidden));
+    $$('a', opts).forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) setOpen(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !opts.hidden) { setOpen(false); btn.focus(); } });
+  })();
+
+  /* ------------------------------------------------------------------
+     Without GSAP: show everything, keep filters working, and stop here
+     ------------------------------------------------------------------ */
+  if (!hasGSAP) {
+    const usedCats = new Set((window.UC8_PROJECTS || []).map((p) => p.category));
+    $$('.filter').forEach((b) => { if (b.dataset.filter !== 'all' && !usedCats.has(b.dataset.filter)) b.hidden = true; });
+    $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
+      $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', String(b === btn)); });
+      const f = btn.dataset.filter;
+      $$('.work-card').forEach((c) => { c.hidden = !(f === 'all' || c.dataset.cat === f); });
+    }));
+    return;
+  }
 
   /* ------------------------------------------------------------------
      Hero entrance (after the intro hands off)
@@ -566,11 +589,13 @@
     const { desk, reduce: rm } = ctx.conditions;
     if (rm) { stage.classList.add('is-resolved'); gsap.from(cards(), { opacity: 0, y: 30, stagger: 0.05, scrollTrigger: { trigger: grid, start: 'top 85%', once: true } }); return; }
 
-    const fits = desk && stage.offsetHeight <= window.innerHeight + 4;
-    const sx = desk ? 0.62 : 0.42, sy = desk ? 0.5 : 0.22;
+    // Pin just below the fixed nav so the heading and filters are never hidden behind it.
+    const navH = () => (nav ? nav.offsetHeight : 0);
+    const fits = desk && stage.offsetHeight <= window.innerHeight - navH() + 4;
+    const sx = desk ? 0.5 : 0.36, sy = desk ? 0.3 : 0.16;
     const st = fits
-      ? { trigger: stage, start: 'top top', end: `+=${Math.min(170, 90 + PROJ.length * 8)}%`, scrub: 1, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
-      : { trigger: board, start: 'top 92%', end: desk ? 'top 15%' : 'top 25%', scrub: 0.8, invalidateOnRefresh: true };
+      ? { trigger: stage, start: () => `top ${navH()}px`, end: `+=${Math.min(110, 60 + PROJ.length * 8)}%`, scrub: 0.5, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
+      : { trigger: board, start: 'top 92%', end: desk ? 'top 25%' : 'top 35%', scrub: 0.5, invalidateOnRefresh: true };
     st.onUpdate = (self) => stage.classList.toggle('is-resolved', self.progress > 0.9);
     st.onLeave = () => stage.classList.add('is-resolved');
 
@@ -586,7 +611,7 @@
     tl.fromTo('.work-card__pin', { opacity: 1, scale: 1 }, { opacity: 0, scale: 0, duration: 0.2, stagger: 0.01 }, 0.12);
     tl.fromTo(table, { opacity: 1, scale: 1 }, { opacity: 0, scale: 1.06, duration: 0.55, ease: 'power2.in' }, 0.45);
     tl.fromTo('.work__head', { opacity: 0.25, y: 30 }, { opacity: 1, y: 0, duration: 0.5 }, 0.5);
-    if (fits) tl.to({}, { duration: 0.3 }); // hold on the resolved grid
+    if (fits) tl.to({}, { duration: 0.12 }); // brief hold on the resolved grid
     return () => stage.classList.remove('is-resolved');
   });
 
@@ -612,10 +637,10 @@
      ------------------------------------------------------------------ */
   if ($('#pipeline')) {
   const steps = $$('[data-step]');
-  const ptl = gsap.timeline({ scrollTrigger: { trigger: '#pipeline', start: 'top 78%', end: 'bottom 62%', scrub: 0.8 } });
+  const ptl = gsap.timeline({ scrollTrigger: { trigger: '#pipeline', start: 'top 78%', end: 'bottom 62%', scrub: 0.5 } });
   ptl.fromTo('#pipelineFill', { '--p': 0 }, { '--p': 1, ease: 'none', duration: steps.length }, 0);
   steps.forEach((s, i) => {
-    ptl.fromTo(s, { opacity: 0, y: 70, rotateX: -14, filter: 'blur(6px)' }, { opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power2.out' }, i * 0.9);
+    ptl.fromTo(s, { opacity: 0, y: 60, rotateX: -12 }, { opacity: 1, y: 0, rotateX: 0, duration: 0.8, ease: 'power2.out' }, i * 0.9);
   });
   }
 

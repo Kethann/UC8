@@ -21,7 +21,8 @@
     { y: 0.90, amp: 0.12, f: 1.1, ph: 4.0, wid: 0.13, tf: 1.6, tph: 1.1, n: 46, tilt: 0.12, sp: 0.05, a: 0.24, sc: 0.8 },
     { y: 0.40, amp: 0.24, f: 0.55, ph: 1.3, wid: 0.08, tf: 2.1, tph: 3.0, n: 30, tilt: -0.45, sp: -0.035, a: 0.20, sc: 1.6, warm: true },
   ];
-  const STEPS = 64;
+  const STEPS = 44;          // points per hairline (lower = cheaper, still smooth at this size)
+  const FRAME_MS = 1000 / 30; // the drift is slow, so 30fps looks identical and halves the cost
 
   /* Dust particles */
   let dust = [];
@@ -34,9 +35,10 @@
   }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     w = window.innerWidth; h = window.innerHeight;
     mobile = w < 768;
+    if (mobile) dpr = 1;
     c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
     c.style.width = w + 'px'; c.style.height = h + 'px';
     makeDust();
@@ -75,7 +77,7 @@
       g.addColorStop(u, `rgba(${base[0]},${base[1]},${base[2]},${al.toFixed(3)})`);
     }
     ctx.strokeStyle = g;
-    const n = mobile ? Math.round(r.n * 0.6) : r.n;
+    const n = Math.round(r.n * (mobile ? 0.35 : 0.6));
     ctx.beginPath();
     for (let j = 0; j < n; j++) {
       const o = (j / (n - 1)) * 2 - 1;
@@ -90,9 +92,12 @@
 
   let last = 0, T = 0;
   function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now;
+    requestAnimationFrame(frame);
+    if (last && now - last < FRAME_MS - 2) return;
+    if (document.documentElement.classList.contains('intro-active')) { last = now; return; } // hidden under the intro
+    const dt = Math.min(0.1, (now - last) / 1000 || 0.033); last = now;
     if (!reduce) T += dt;
-    smoothS += (scrollY - smoothS) * 0.075;
+    smoothS += (scrollY - smoothS) * 0.14;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.lineWidth = mobile ? 0.6 : 0.7;
@@ -109,7 +114,6 @@
       ctx.beginPath(); ctx.arc(x, y, p.r * p.z, 0, TAU); ctx.fill();
     }
     ctx.globalCompositeOperation = 'source-over';
-    requestAnimationFrame(frame);
   }
 
   resize();
