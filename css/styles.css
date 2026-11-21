@@ -1754,3 +1754,7 @@ a, button, .work-card, .filter, .case__ig { -webkit-tap-highlight-color: transpa
   /* fully solid so page text never shows through the bar */
   .tabbar { background: linear-gradient(180deg, #1b1b20, #141418); }
 }
+
+/* Far jumps from the nav / tab bar: brief fade instead of racing through every section */
+main, .footer { transition: opacity 0.22s ease; }
+html.is-jumping main, html.is-jumping .footer { opacity: 0; transition-duration: 0.15s; }

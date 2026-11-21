@@ -49,12 +49,32 @@
     lenis && lenis.stop();
   }
 
+  // Nearby sections: short smooth scroll. Far sections: quick fade → jump → fade in, so the page doesn't
+  // race through every animation on the way (that rapid-fire is what looked like flicker).
+  let jumping = false;
   function scrollToTarget(hash) {
     const el = hash === '#home' || hash === '#top' ? 0 : $(hash);
-    if (el === null) return;
-    if (lenis) lenis.scrollTo(el, { offset: el === 0 ? 0 : -70, duration: 1.4 });
-    else if (el === 0) window.scrollTo({ top: 0, behavior: 'smooth' });
-    else el.scrollIntoView({ behavior: 'smooth' });
+    if (el === null || jumping) return;
+    const OFF = 70;
+    const yOf = () => (el === 0 ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - OFF));
+    const go = (y, immediate) => {
+      if (lenis) lenis.scrollTo(y, immediate ? { immediate: true, force: true } : { duration: Math.min(1, 0.5 + Math.abs(y - window.scrollY) / 4000), force: true });
+      else window.scrollTo({ top: y, behavior: immediate ? 'auto' : 'smooth' });
+    };
+    const y = yOf(), far = Math.abs(y - window.scrollY) > window.innerHeight * 1.5;
+    if (!far || reduce) { go(y, false); return; }
+    jumping = true;
+    const root = document.documentElement;
+    root.classList.add('is-jumping');
+    setTimeout(() => {
+      go(y, true);
+      if (hasGSAP) ScrollTrigger.update();
+      requestAnimationFrame(() => {
+        const y2 = yOf();                       // pinned sections can shift the target once ScrollTrigger updates
+        if (Math.abs(y2 - window.scrollY) > 2) { go(y2, true); if (hasGSAP) ScrollTrigger.update(); }
+        setTimeout(() => { root.classList.remove('is-jumping'); jumping = false; }, 90);
+      });
+    }, 170);
   }
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
