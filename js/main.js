@@ -71,6 +71,93 @@
   });
 
   /* ------------------------------------------------------------------
+     Bottom tab bar (phones/tablets): sliding highlight + label on change.
+     Uses IntersectionObserver only, so it works with or without GSAP.
+     ------------------------------------------------------------------ */
+  (function tabbar() {
+    const bar = $('#tabbar'); if (!bar) return;
+    const items = $$('.tabbar__item', bar);
+    let current = null, tipT = 0;
+    const showTip = (i) => {
+      clearTimeout(tipT);
+      items.forEach((a, j) => a.classList.toggle('show-tip', j === i));
+      tipT = setTimeout(() => items[i] && items[i].classList.remove('show-tip'), 1400);
+    };
+    const pop = (a) => { a.classList.remove('pop'); void a.offsetWidth; a.classList.add('pop'); setTimeout(() => a.classList.remove('pop'), 600); };
+    const select = (key, tip) => {
+      const i = items.findIndex((a) => a.dataset.tab === key);
+      if (i < 0 || key === current) return;
+      current = key;
+      items.forEach((a, j) => { a.classList.toggle('is-active', j === i); if (j === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+      bar.style.setProperty('--i', i);
+      bar.dataset.active = key;
+      bar.classList.add('has-active');
+      if (tip) { showTip(i); pop(items[i]); }
+    };
+    const pre = items.find((a) => a.classList.contains('is-active'));
+    if (pre) { current = null; select(pre.dataset.tab, false); }
+    // tapping a tab: highlight it straight away (the scroll then confirms it)
+    // and ignore the sections passed on the way, so the highlight doesn't jump through them
+    let lockUntil = 0;
+    items.forEach((a) => a.addEventListener('click', (e) => {
+      if (dragMoved) { e.preventDefault(); return; }   // a drag already handled it
+      lockUntil = performance.now() + 1600; select(a.dataset.tab, true);
+    }));
+
+    // Drag along the bar to switch: the pill follows the finger, release to go there
+    let dragging = false, dragMoved = false, startX = 0, hover = -1;
+    const idxAt = (x) => {
+      const r = bar.getBoundingClientRect(), w = (r.width - 12) / items.length;
+      return Math.max(0, Math.min(items.length - 1, Math.floor((x - r.left - 6) / w)));
+    };
+    bar.addEventListener('pointerdown', (e) => {
+      if (e.button > 0) return;
+      dragging = true; dragMoved = false; startX = e.clientX; hover = idxAt(e.clientX);
+    });
+    bar.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      if (!dragMoved && Math.abs(e.clientX - startX) < 8) return;
+      if (!dragMoved) { dragMoved = true; bar.classList.add('is-drag'); try { bar.setPointerCapture(e.pointerId); } catch (_) {} }
+      const i = idxAt(e.clientX);
+      if (i !== hover) {
+        hover = i; bar.style.setProperty('--i', i); bar.dataset.active = items[i].dataset.tab; showTip(i);
+        if (navigator.vibrate) { try { navigator.vibrate(6); } catch (_) {} }
+      }
+    });
+    const endDrag = (e, cancel) => {
+      if (!dragging) return;
+      dragging = false; bar.classList.remove('is-drag');
+      if (!dragMoved) return;
+      const target = items[hover];
+      if (cancel || !target) {
+        const i = items.findIndex((a) => a.dataset.tab === current); bar.style.setProperty('--i', i); bar.dataset.active = current || '';
+        setTimeout(() => { dragMoved = false; }, 0);
+        return;
+      }
+      dragMoved = false;                       // let the click below go through normally (scrolls, or opens Team / Work)
+      current = null; select(target.dataset.tab, true);
+      target.click();
+    };
+    bar.addEventListener('pointerup', (e) => endDrag(e, false));
+    bar.addEventListener('pointercancel', (e) => endDrag(e, true));
+
+    // Typing (contact form): hide the bar so it never covers the field or the keyboard
+    const isField = (el) => el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable);
+    document.addEventListener('focusin', (e) => { if (isField(e.target)) document.body.classList.add('kb-open'); });
+    document.addEventListener('focusout', (e) => { if (isField(e.target)) setTimeout(() => { if (!isField(document.activeElement)) document.body.classList.remove('kb-open'); }, 120); });
+    // home page: follow the section in the middle of the screen
+    const secs = $$('[data-section]');
+    if (!secs.length || !('IntersectionObserver' in window)) return;
+    let first = true;
+    const io = new IntersectionObserver((ents) => {
+      if (performance.now() < lockUntil) { first = false; return; }
+      ents.forEach((en) => { if (en.isIntersecting) { select(en.target.dataset.section, !first); } });
+      first = false;
+    }, { rootMargin: '-45% 0px -54% 0px' });
+    secs.forEach((s) => io.observe(s));
+  })();
+
+  /* ------------------------------------------------------------------
      Top scroll progress line
      ------------------------------------------------------------------ */
   (function progress() {
@@ -397,12 +484,12 @@
       </div>
     </article>`).join('') + VIDS.map((v, j) => `
     <article class="work-card work-card--video${v.v ? '' : ' is-wide'}" data-cat="Video" data-i="${PROJ.length + j}">
-      <a class="work-card__inner vcard" href="https://drive.google.com/file/d/${encodeURIComponent(v.id)}/view" target="_blank" rel="noopener" aria-label="Play ${esc(v.title)} (${esc(v.cat)}) on Google Drive, opens in a new tab">
+      <a class="work-card__inner vcard" href="https://drive.google.com/file/d/${encodeURIComponent(v.id)}/view" aria-label="Play ${esc(v.title)} (${esc(v.cat)}) on Google Drive">
         <img src="${v.thumb}" alt="" loading="lazy" decoding="async"${v.pos ? ` style="object-position:${v.pos}"` : ''} />
         <span class="vcard__shade" aria-hidden="true"></span>
         <span class="vcard__top" aria-hidden="true"><span class="vcard__cat mono">${esc(v.cat)}</span>${v.dur ? `<span class="vcard__dur mono">${v.dur}</span>` : ''}</span>
         <span class="vcard__play" aria-hidden="true"><svg class="ico"><use href="#i-play"/></svg></span>
-        <span class="vcard__info"><strong>${esc(v.title)}</strong><small class="mono">${v.v ? 'Reel' : 'Film'}${v.dur ? ` · ${v.dur}` : ''}</small></span>
+        <span class="vcard__info"><strong>${esc(v.title)}</strong><small class="mono">${v.v ? 'Reel' : 'Video'}${v.dur ? ` · ${v.dur}` : ''}</small></span>
         <span class="work-card__pin" aria-hidden="true"></span>
       </a>
     </article>`).join('');

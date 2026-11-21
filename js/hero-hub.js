@@ -120,7 +120,8 @@
 
   function resize() {
     const r = hero.getBoundingClientRect();
-    dpr = Math.min(quality ? 1 : 1.5, window.devicePixelRatio || 1); // decorative canvas: 1.5x is sharp enough; 1x on slow devices
+    // decorative canvas: 1.5x is sharp enough on desktop; phones and slow devices draw at 1x (4x fewer pixels than retina)
+    dpr = Math.min(quality || r.width < 700 ? 1 : 1.5, window.devicePixelRatio || 1);
     W = Math.round(r.width); H = Math.round(r.height);
     canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     measure(); buildTraces();
@@ -409,17 +410,23 @@
     const inA = ease(p / 0.14), outA = p > 0.9 ? 1 - (p - 0.9) / 0.1 : 1, a = Math.min(inA, outA);
     ctx.globalAlpha *= a;
     const oy = (1 - inA) * r * 0.25;
-    const g = drawGlyph(st.kind, x, y - r * 0.12 + oy, r * 0.48, p * STAGE_T, 0, clamp((p - 0.06) / 0.86));
+    // text stack under the icon: word / number / label, sized to the circle with fixed gaps so they never overlap
+    const L = (() => {
+      const ws = Math.max(8, r * 0.085), ns = Math.max(12, r * 0.15), ls = Math.max(7, r * 0.058), gap = Math.max(2, r * 0.03);
+      const wordY = y + r * 0.3 + ws / 2, numY = wordY + ws / 2 + gap + ns / 2, labY = numY + ns / 2 + gap + ls / 2;
+      return { ws, ns, ls, wordY, numY, labY };
+    })();
+    const g = drawGlyph(st.kind, x, y - r * 0.2 + oy, r * 0.44, p * STAGE_T, 0, clamp((p - 0.06) / 0.86));
     if (g.glow > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter';
-      const gg = ctx.createRadialGradient(x, y - r * 0.12, r * 0.1, x, y - r * 0.12, r * 0.9); gg.addColorStop(0, `rgba(${g.gc},${0.4 * g.glow})`); gg.addColorStop(1, `rgba(${g.gc},0)`);
+      const gg = ctx.createRadialGradient(x, y - r * 0.2, r * 0.1, x, y - r * 0.2, r * 0.9); gg.addColorStop(0, `rgba(${g.gc},${0.4 * g.glow})`); gg.addColorStop(1, `rgba(${g.gc},0)`);
       ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-    ctx.font = `600 ${Math.max(10, r * 0.1)}px "JetBrains Mono", monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `600 ${L.ws}px "JetBrains Mono", monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ff7a1a';
     { // manual letter-spacing (identical in every browser)
-      const sp = Math.max(1.5, r * 0.022), chars = st.word.split(''), ws = chars.map((ch) => ctx.measureText(ch).width);
+      const sp = Math.max(1, r * 0.02), chars = st.word.split(''), ws = chars.map((ch) => ctx.measureText(ch).width);
       const total = ws.reduce((a2, b2) => a2 + b2, 0) + sp * (chars.length - 1);
       let cx2 = x - total / 2; ctx.textAlign = 'left';
-      chars.forEach((ch, j) => { ctx.fillText(ch, cx2, y + r * 0.45 + oy * 0.5); cx2 += ws[j] + sp; });
+      chars.forEach((ch, j) => { ctx.fillText(ch, cx2, L.wordY + oy * 0.5); cx2 += ws[j] + sp; });
     }
     ctx.restore();
     // reach counter: 0 → 2.5M and 0 → 30 days together in 1.2s (fast, ease-out), holds "2.5M+" for 2s, then replays
@@ -429,9 +436,8 @@
       const k = Math.min(1, lt / RUN), e = k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
       const num = k >= 1 ? '2.5M+' : Math.round(2500000 * e).toLocaleString('en-US');
       const days = k >= 1 ? 30 : Math.max(1, Math.round(30 * e));
-      const ny = y + r * 0.6, fs = Math.max(13, r * 0.155);
-      text(num, x, ny, fs, k >= 1 ? '#ffffff' : 'rgba(255,255,255,0.86)', 400, 'center', '"Anton", Impact, "Arial Narrow", sans-serif');
-      text(`REACH IN ${days} DAYS`, x, ny + fs * 0.86, Math.max(8, r * 0.066), 'rgba(255,122,26,0.95)', 600, 'center', '"JetBrains Mono", monospace');
+      text(num, x, L.numY, L.ns, k >= 1 ? '#ffffff' : 'rgba(255,255,255,0.86)', 400, 'center', '"Anton", Impact, "Arial Narrow", sans-serif');
+      text(`REACH IN ${days} DAYS`, x, L.labY, L.ls, 'rgba(255,122,26,0.95)', 600, 'center', '"JetBrains Mono", monospace');
     }
 
     // glass on top: fresnel rim, window reflection, glints
@@ -520,12 +526,15 @@
   let raf = 0, visible = true, tPrev = performance.now(), t0 = tPrev;
   let warmed = 0;
   // Adaptive quality: 30fps normally; if this device can't keep up, drop to 20fps and 1x resolution.
-  let costSum = 0, costN = 0, lastMeasureY = -1, measureTick = 0;
+  let costSum = 0, costN = 0, lastMeasureY = -1, measureTick = 0, lastScrollT = 0;
+  window.addEventListener('scroll', () => { lastScrollT = performance.now(); }, { passive: true });
   function frame(now) {
     // Under the intro: draw only a couple of warm-up frames (hidden behind the black intro) so the
     // one-off GPU setup cost (shaders, glyphs, buffers) is paid now, not when the logo flies to the nav.
     if (document.documentElement.classList.contains('intro-active') && warmed >= 2) { tPrev = now; raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; }
-    if (warmed >= 2 && now - tPrev < (quality ? 50 : 33) - 4) { raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; }
+    // While the page is being scrolled the hub is leaving the screen: redraw at 15fps so the scroll gets the frame budget
+    const scrolling = now - lastScrollT < 160;
+    if (warmed >= 2 && now - tPrev < (scrolling ? 66 : quality || W < 700 ? 50 : 33) - 4) { raf = visible && !reduce ? requestAnimationFrame(frame) : 0; return; }
     warmed++;
     const c0 = performance.now();
     const dt = Math.max(0, Math.min(0.06, (now - tPrev) / 1000)); tPrev = now;

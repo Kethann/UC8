@@ -1631,3 +1631,126 @@ a, button, .work-card, .filter, .case__ig { -webkit-tap-highlight-color: transpa
 /* "About UC8": the real seven-segment UC8 mark in brand blue */
 .seglogo--inline { height: 1.05em; width: auto; vertical-align: -0.16em; margin-left: 0.45em; overflow: visible; filter: drop-shadow(0 0 5px rgba(47, 123, 255, 0.55)); }
 .seglogo--inline .seg { fill: var(--blue); }
+
+/* ==========================================================================
+   Bottom tab bar (phones + tablets), replaces the menu button.
+   Solid background (no backdrop blur) so it never flickers while scrolling;
+   sits above the browser toolbar / home indicator via the safe-area inset.
+   ========================================================================== */
+.tabbar { display: none; }
+@media (max-width: 1023px) {
+  .nav__burger, .mobile-menu { display: none !important; }
+  .tabbar {
+    --tab: min(48px, calc((100vw - 44px) / 7));
+    position: fixed; z-index: 90; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: repeat(7, var(--tab)); align-items: center; gap: 0;
+    padding: 6px; border-radius: 999px; transform: translate3d(-50%, 0, 0);
+    background: rgba(20, 20, 24, 0.94); border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    contain: layout style; -webkit-tap-highlight-color: transparent;
+  }
+  .tabbar__item {
+    position: relative; z-index: 1; display: grid; place-items: center; width: var(--tab); height: var(--tab);
+    color: rgba(255, 255, 255, 0.62); border-radius: 50%; touch-action: manipulation; transition: color 0.25s;
+  }
+  .tabbar__item .ico { width: 22px; height: 22px; stroke-width: 1.7; transition: transform 0.3s var(--ease); }
+  .tabbar__item:active .ico { transform: scale(0.88); }
+  .tabbar__item.is-active { color: #fff; }
+  .tabbar__pill {
+    position: absolute; z-index: 0; top: 6px; left: 6px; width: var(--tab); height: var(--tab); border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, rgba(255, 122, 26, 0.55), rgba(255, 122, 26, 0.18) 70%);
+    box-shadow: inset 0 0 0 1px rgba(255, 140, 60, 0.55);
+    transform: translate3d(calc(var(--i, 0) * var(--tab)), 0, 0); transition: transform 0.42s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.25s;
+    opacity: 0;
+  }
+  .tabbar.has-active .tabbar__pill { opacity: 1; }
+  .tabbar__tip {
+    position: absolute; bottom: calc(100% + 12px); left: 50%; padding: 5px 10px; border-radius: 999px; white-space: nowrap;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: #fff; background: rgba(20, 20, 24, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12); pointer-events: none;
+    opacity: 0; transform: translate3d(-50%, 6px, 0); transition: opacity 0.25s, transform 0.3s var(--ease);
+  }
+  .tabbar__item.show-tip .tabbar__tip { opacity: 1; transform: translate3d(-50%, 0, 0); }
+  /* keep page content clear of the bar */
+  body { padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
+  .nav__inner { justify-content: space-between; }
+}
+@media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+  .tabbar__pill, .tabbar__tip, .tabbar__item .ico { transition: none; }
+}
+@media (max-width: 1023px) {
+  /* leave room under the hero buttons so the tab bar never covers them */
+  .hero { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ==========================================================================
+   Performance pass (measured): fewer full-screen layers and blurs
+   ========================================================================== */
+/* The grain overlay had no texture (drew nothing) but blended a layer 4x the screen size
+   over the whole page and moved it 5 times a second. Removed. */
+.grain { display: none !important; animation: none !important; }
+/* Split-word spans only need a GPU layer while they animate (GSAP handles that) */
+.w__i { will-change: auto; }
+/* Icon badges sit inside cards that are already frosted: a second blur adds nothing visible */
+.badge, .step .badge, .service .badge, .badge--round, .badge--sm { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+/* Phones / tablets: no live blur anywhere while scrolling; solid tints instead */
+@media (max-width: 1023px), (hover: none) {
+  .ticker, .btn, .map.glass, .form.glass { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .nav.is-scrolled::before { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(10, 10, 12, 0.94); }
+}
+
+/* ==========================================================================
+   Tab bar v2: per-tab colour (no orange), tinted fill when selected,
+   small icon motion on select/hover, drag-to-switch, hides while typing
+   ========================================================================== */
+@media (max-width: 1023px) {
+  .tabbar { touch-action: none; user-select: none; -webkit-user-select: none; transition: transform 0.35s var(--ease), opacity 0.25s; }
+  .tabbar__item[data-tab="home"]     { --tc: #f2f2f5; --tbg: rgba(242, 242, 245, 0.12); }
+  .tabbar__item[data-tab="about"]    { --tc: #6cc4f5; --tbg: rgba(108, 196, 245, 0.16); }
+  .tabbar__item[data-tab="team"]     { --tc: #a78bfa; --tbg: rgba(167, 139, 250, 0.17); }
+  .tabbar__item[data-tab="work"]     { --tc: #f48fc0; --tbg: rgba(244, 143, 192, 0.16); }
+  .tabbar__item[data-tab="process"]  { --tc: #62d6ab; --tbg: rgba(98, 214, 171, 0.16); }
+  .tabbar__item[data-tab="services"] { --tc: #f2c46d; --tbg: rgba(242, 196, 109, 0.15); }
+  .tabbar__item[data-tab="contact"]  { --tc: #ff9a85; --tbg: rgba(255, 154, 133, 0.16); }
+  .tabbar__item { color: rgba(255, 255, 255, 0.58); }
+  .tabbar__item.is-active { color: var(--tc); --tf: 0.24; }
+  .tabbar__item .ico { width: 23px; height: 23px; stroke-width: 1.65; }
+  /* pill takes the colour of the selected tab */
+  .tabbar__pill { background: var(--pbg, rgba(255, 255, 255, 0.1)); box-shadow: inset 0 0 0 1px var(--pring, rgba(255, 255, 255, 0.16)); transition: transform 0.42s cubic-bezier(0.3, 0.9, 0.3, 1), background 0.3s, box-shadow 0.3s, opacity 0.25s; }
+  .tabbar[data-active="home"]     { --pbg: rgba(242, 242, 245, 0.12); --pring: rgba(242, 242, 245, 0.28); }
+  .tabbar[data-active="about"]    { --pbg: rgba(108, 196, 245, 0.16); --pring: rgba(108, 196, 245, 0.42); }
+  .tabbar[data-active="team"]     { --pbg: rgba(167, 139, 250, 0.17); --pring: rgba(167, 139, 250, 0.45); }
+  .tabbar[data-active="work"]     { --pbg: rgba(244, 143, 192, 0.16); --pring: rgba(244, 143, 192, 0.42); }
+  .tabbar[data-active="process"]  { --pbg: rgba(98, 214, 171, 0.16); --pring: rgba(98, 214, 171, 0.42); }
+  .tabbar[data-active="services"] { --pbg: rgba(242, 196, 109, 0.15); --pring: rgba(242, 196, 109, 0.42); }
+  .tabbar[data-active="contact"]  { --pbg: rgba(255, 154, 133, 0.16); --pring: rgba(255, 154, 133, 0.42); }
+  .tabbar__tip { color: var(--tc, #fff); border-color: var(--tbg, rgba(255, 255, 255, 0.12)); }
+  /* while dragging, the pill follows the finger closely */
+  .tabbar.is-drag .tabbar__pill { transition: transform 0.12s ease-out, background 0.2s, box-shadow 0.2s; }
+  /* keyboard open (typing in the contact form): get out of the way */
+  body.kb-open .tabbar { transform: translate3d(-50%, 160%, 0); opacity: 0; pointer-events: none; }
+}
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  .tabbar__item.pop .ico { animation: tabPop 0.5s cubic-bezier(0.3, 1.4, 0.5, 1); }
+  .tabbar__item.pop[data-tab="home"] .ico { animation-name: tabHome; }
+  .tabbar__item.pop[data-tab="about"] .ico { animation-name: tabTilt; }
+  .tabbar__item.pop[data-tab="team"] .ico { animation-name: tabHop; }
+  .tabbar__item.pop[data-tab="work"] .ico { animation-name: tabTilt; }
+  .tabbar__item.pop[data-tab="process"] .ico { animation-name: tabNudge; }
+  .tabbar__item.pop[data-tab="services"] .ico { animation-name: tabShout; }
+  .tabbar__item.pop[data-tab="contact"] .ico { animation-name: tabSend; }
+}
+@media (max-width: 1023px) and (hover: hover) {
+  .tabbar__item:hover .ico { transform: translateY(-2px); }
+}
+@keyframes tabPop { 0% { transform: scale(0.8); } 60% { transform: scale(1.14); } 100% { transform: none; } }
+@keyframes tabHome { 0% { transform: translateY(3px) scale(0.9); } 55% { transform: translateY(-3px) scale(1.08); } 100% { transform: none; } }
+@keyframes tabTilt { 0% { transform: rotate(0); } 35% { transform: rotate(-12deg) scale(1.08); } 70% { transform: rotate(6deg); } 100% { transform: none; } }
+@keyframes tabHop { 0%, 100% { transform: none; } 40% { transform: translateY(-4px); } 70% { transform: translateY(1px); } }
+@keyframes tabNudge { 0% { transform: translateX(-3px); } 55% { transform: translateX(3px) scale(1.06); } 100% { transform: none; } }
+@keyframes tabShout { 0%, 100% { transform: none; } 25% { transform: rotate(-14deg) scale(1.08); } 50% { transform: rotate(8deg); } 75% { transform: rotate(-4deg); } }
+@keyframes tabSend { 0% { transform: none; } 40% { transform: translate(4px, -4px) scale(0.9); opacity: 0.4; } 41% { transform: translate(-4px, 4px) scale(0.9); } 100% { transform: none; opacity: 1; } }
+@media (max-width: 1023px) {
+  /* fully solid so page text never shows through the bar */
+  .tabbar { background: linear-gradient(180deg, #1b1b20, #141418); }
+}
